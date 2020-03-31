@@ -85,7 +85,7 @@ const createShowMoreButtonTemplate = () => {
 
 const createFilmDetailsTemplate = () => {
   return (
-    `<section class="film-details">
+    `<section class="film-details visually-hidden">
   <form class="film-details__inner" action="" method="get">
     <div class="form-details__top-container">
       <div class="film-details__close">
@@ -288,3 +288,7 @@ for (let i = 0; i < CARD_TOP_COUNT; i++) {
 for (let i = 0; i < CARD_COMMENTED_COUNT; i++) {
   render(filmCommentedListElement, createCardTemplate(), `beforeend`);
 }
+
+const footerElement = document.querySelector(`.footer`);
+
+render(footerElement, createFilmDetailsTemplate(), `beforeend`);
