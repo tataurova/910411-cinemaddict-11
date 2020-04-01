@@ -271,7 +271,7 @@ render(siteMainElement, createFilmBlockTemplate(), `beforeend`);
 
 const filmBlockElement = siteMainElement.querySelector(`.films`);
 
-render(filmBlockElement, createFilmListTemplate([`All movies. Upcoming`, , ` visually-hidden`]), `beforeend`);
+render(filmBlockElement, createFilmListTemplate([`All movies. Upcoming`, ``, ` visually-hidden`]), `beforeend`);
 
 const filmListContainerElement = siteMainElement.querySelector(`.films-list__container`);
 const filmListElement = siteMainElement.querySelector(`.films-list`);
