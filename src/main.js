@@ -1,8 +1,10 @@
 "use strict";
 
-const CARD_COUNT = 5;
-const CARD_TOP_COUNT = 2;
-const CARD_COMMENTED_COUNT = 2;
+const CardCount = {
+  MAIN: 5,
+  TOP: 2,
+  COMMENTED: 2
+};
 
 const createProfileTemplate = () => {
   return (
@@ -23,9 +25,13 @@ const createFilterTemplate = () => {
         <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">8</span></a>
       </div>
       <a href="#stats" class="main-navigation__additional">Stats</a>
-    </nav>
+    </nav>`
+  );
+};
 
-    <ul class="sort">
+const createSortTemplate = () => {
+  return (
+    `<ul class="sort">
       <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
       <li><a href="#" class="sort__button">Sort by date</a></li>
       <li><a href="#" class="sort__button">Sort by rating</a></li>
@@ -36,22 +42,16 @@ const createFilterTemplate = () => {
 const createFilmBlockTemplate = () => {
   return (
     `<section class="films">
-      <section class="films-list">
-        <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
+     </section>`
+  );
+};
 
-        <div class="films-list__container"></div>
-      </section>
-      <section class="films-list--extra">
-      <h2 class="films-list__title">Top rated</h2>
-
+const createFilmListTemplate = ([title, classModifier = ``, className = ``]) => {
+  return (
+    `<section class="films-list${classModifier}">
+      <h2 class="films-list__title${className}">${title}</h2>
       <div class="films-list__container"></div>
-     </section>
-     <section class="films-list--extra">
-      <h2 class="films-list__title">Most commented</h2>
-
-      <div class="films-list__container"></div>
-     </section>
-    </section>`
+     </section>`
   );
 };
 
@@ -266,26 +266,33 @@ const siteMainElement = document.querySelector(`.main`);
 
 render(headerElement, createProfileTemplate(), `beforeend`);
 render(siteMainElement, createFilterTemplate(), `beforeend`);
+render(siteMainElement, createSortTemplate(), `beforeend`);
 render(siteMainElement, createFilmBlockTemplate(), `beforeend`);
+
+const filmBlockElement = siteMainElement.querySelector(`.films`);
+
+render(filmBlockElement, createFilmListTemplate([`All movies. Upcoming`,, ` visually-hidden`]), `beforeend`);
 
 const filmListContainerElement = siteMainElement.querySelector(`.films-list__container`);
 const filmListElement = siteMainElement.querySelector(`.films-list`);
 
-for (let i = 0; i < CARD_COUNT; i++) {
+for (let i = 0; i < CardCount.MAIN; i++) {
   render(filmListContainerElement, createCardTemplate(), `beforeend`);
 }
 
 render(filmListElement, createShowMoreButtonTemplate(), `beforeend`);
 
-const filmAdditionalListElement = siteMainElement.querySelectorAll(`.films-list--extra .films-list__container`);
-const filmTopListElement = filmAdditionalListElement[0];
-const filmCommentedListElement = filmAdditionalListElement[1];
+render(filmBlockElement, createFilmListTemplate([`Top rated`, `--extra`]), `beforeend`);
+render(filmBlockElement, createFilmListTemplate([`Most commented`, `--extra`]), `beforeend`);
 
-for (let i = 0; i < CARD_TOP_COUNT; i++) {
+const filmTopListElement = siteMainElement.querySelector(`.films-list--extra:nth-child(2) .films-list__container`);
+const filmCommentedListElement = siteMainElement.querySelector(`.films-list--extra:nth-child(3) .films-list__container`);
+
+for (let i = 0; i < CardCount.TOP; i++) {
   render(filmTopListElement, createCardTemplate(), `beforeend`);
 }
 
-for (let i = 0; i < CARD_COMMENTED_COUNT; i++) {
+for (let i = 0; i < CardCount.COMMENTED; i++) {
   render(filmCommentedListElement, createCardTemplate(), `beforeend`);
 }
 
