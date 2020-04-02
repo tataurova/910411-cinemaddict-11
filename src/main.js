@@ -46,10 +46,10 @@ const createFilmBlockTemplate = () => {
   );
 };
 
-const createFilmListTemplate = ([title, classModifier = ``, className = ``]) => {
+const createFilmListTemplate = ({title, isExtra = false}) => {
   return (
-    `<section class="films-list${classModifier}">
-      <h2 class="films-list__title${className}">${title}</h2>
+    `<section class="films-list${isExtra ? "--extra" : ""}">
+      <h2 class="films-list__title">${title}</h2>
       <div class="films-list__container"></div>
      </section>`
   );
@@ -257,6 +257,12 @@ const createFilmDetailsTemplate = () => {
   );
 };
 
+const createFooterStatisticsTemplate = () => {
+  return (
+    `<p>130 291 movies inside</p>`
+  );
+};
+
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
@@ -271,7 +277,7 @@ render(siteMainElement, createFilmBlockTemplate(), `beforeend`);
 
 const filmBlockElement = siteMainElement.querySelector(`.films`);
 
-render(filmBlockElement, createFilmListTemplate([`All movies. Upcoming`, ``, ` visually-hidden`]), `beforeend`);
+render(filmBlockElement, createFilmListTemplate({title: `All movies. Upcoming`, isExtra: false}), `beforeend`);
 
 const filmListContainerElement = siteMainElement.querySelector(`.films-list__container`);
 const filmListElement = siteMainElement.querySelector(`.films-list`);
@@ -282,8 +288,8 @@ for (let i = 0; i < CardCount.MAIN; i++) {
 
 render(filmListElement, createShowMoreButtonTemplate(), `beforeend`);
 
-render(filmBlockElement, createFilmListTemplate([`Top rated`, `--extra`]), `beforeend`);
-render(filmBlockElement, createFilmListTemplate([`Most commented`, `--extra`]), `beforeend`);
+render(filmBlockElement, createFilmListTemplate({title: `Top rated`, isExtra: true}), `beforeend`);
+render(filmBlockElement, createFilmListTemplate({title: `Most commented`, isExtra: true}), `beforeend`);
 
 const filmTopListElement = siteMainElement.querySelector(`.films-list--extra:nth-child(2) .films-list__container`);
 const filmCommentedListElement = siteMainElement.querySelector(`.films-list--extra:nth-child(3) .films-list__container`);
@@ -296,6 +302,9 @@ for (let i = 0; i < CardCount.COMMENTED; i++) {
   render(filmCommentedListElement, createCardTemplate(), `beforeend`);
 }
 
-const footerElement = document.querySelector(`.footer`);
+const footerStatisticElement = document.querySelector(`.footer__statistics`);
 
-render(footerElement, createFilmDetailsTemplate(), `beforeend`);
+render(footerStatisticElement, createFooterStatisticsTemplate(), `beforeend`);
+
+const bodyElement = document.querySelector(`body`);
+render(bodyElement, createFilmDetailsTemplate(), `beforeend`);
