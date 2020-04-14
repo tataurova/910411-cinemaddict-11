@@ -1,8 +1,8 @@
-import {countFilms} from "../mock/film.js";
+import {filmCount} from "../main.js";
 
 export const createStatsTemplate = () => {
-  const setNewFormatCount = countFilms.toString().replace(/(\d)(?=(\d{3})+(\D|$))/g, `$1 `);
+  const newFormatCount = filmCount.toString().replace(/(\d)(?=(\d{3})+(\D|$))/g, `$1 `);
   return (
-    `<p>${setNewFormatCount} movies inside</p>`
+    `<p>${newFormatCount} movies inside</p>`
   );
 };

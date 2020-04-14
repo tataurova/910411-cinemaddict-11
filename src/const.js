@@ -1,14 +1,23 @@
-export const MONTH_NAMES = [
-  `January`,
-  `February`,
-  `March`,
-  `April`,
-  `May`,
-  `June`,
-  `July`,
-  `August`,
-  `September`,
-  `October`,
-  `November`,
-  `December`,
-];
+export const CardCount = {
+  MAIN: 20,
+  TOP: 2,
+  COMMENTED: 2,
+  SHOWING_FILMS_COUNT_ON_START: 8,
+  SHOWING_FILMS_COUNT_BY_BUTTON: 8,
+};
+
+export const ProfileNames = {
+  MAX_RATING: `Movie Buff`,
+  MIDDLE_RATING: `Fan`,
+  MIN_RATING: `Novice`,
+};
+
+export const ProfileRatingValues = {
+  LOWER_THRESHOLD_MIN_RATING: 1,
+  UPPER_THRESHOLD_MIN_RATING: 10,
+  LOWER_THRESHOLD_MIDDLE_RATING: 11,
+  UPPER_THRESHOLD_MIDDLE_RATING: 20,
+  LOWER_THRESHOLD_MAX_RATING: 21,
+};
+
+export const MAX_LENGTH_TEXT = 140;

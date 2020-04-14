@@ -1,3 +1,5 @@
+import {MAX_LENGTH_TEXT} from "../const.js";
+
 export const createCardTemplate = (film) => {
   const {poster, title, rating, yearProduction, duration, genres, description, comments} = film;
   const countComments = comments.length;
@@ -13,7 +15,7 @@ export const createCardTemplate = (film) => {
       </p>
       <img src="${poster}" alt="" class="film-card__poster">
       <p class="film-card__description">
-        ${description.length < 140 ? `${descriptionFull.slice(1, 139)}...` : `${descriptionFull}`}
+        ${descriptionFull.length > MAX_LENGTH_TEXT ? `${descriptionFull.slice(0, MAX_LENGTH_TEXT - 1)}...` : `${descriptionFull}`}
       </p>
       <a class="film-card__comments">${countComments} comments</a>
       <form class="film-card__controls">

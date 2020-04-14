@@ -1,4 +1,4 @@
-const createGenresMarkup = (genres) => {
+const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
     return (
       `<span class="film-details__genre">${genre}</span>`
@@ -6,7 +6,7 @@ const createGenresMarkup = (genres) => {
   }).join(`\n`);
 };
 
-const createCommentsMarkup = (comments) => {
+const createCommentsTemplate = (comments) => {
   return comments.map((comment) => {
     const {text, emotion, author, createDate} = comment;
     return (
@@ -86,7 +86,7 @@ export const createFilmDetailsTemplate = (film) => {
             <tr class="film-details__row">
               <td class="film-details__term">${genres.length === 1 ? `Genre` : `Genres`}</td>
               <td class="film-details__cell">
-                ${createGenresMarkup(genres)}
+                ${createGenresTemplate(genres)}
               </td>
             </tr>
           </table>
@@ -114,7 +114,7 @@ export const createFilmDetailsTemplate = (film) => {
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${countComments}</span></h3>
 
         <ul class="film-details__comments-list">
-          ${createCommentsMarkup(comments)}
+          ${createCommentsTemplate(comments)}
         </ul>
 
         <div class="film-details__new-comment">

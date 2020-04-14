@@ -1,19 +1,21 @@
-import {countWatchedFilms} from "../mock/profile.js";
+import {watchedFilmCount} from "../main.js";
+import {ProfileNames, ProfileRatingValues} from "../const.js";
 
-const setProfileRating = (count) => {
-  if (count > 21) {
-    return `Movie Buff`;
-  } else if (count >= 1 && count <= 10) {
-    return `Novice`;
-  } else if (count >= 11 && count <= 20) {
-    return `Fan`;
-  } else {
-    return ``;
+const getProfileRating = (count) => {
+  if (count > ProfileRatingValues.LOWER_THRESHOLD_MAX_RATING) {
+    return ProfileNames.MAX_RATING;
   }
+  if (count >= ProfileRatingValues.LOWER_THRESHOLD_MIN_RATING && count <= ProfileRatingValues.UPPER_THRESHOLD_MIN_RATING) {
+    return ProfileNames.MIDDLE_RATING;
+  }
+  if (count >= ProfileRatingValues.LOWER_THRESHOLD_MIDDLE_RATING && count <= ProfileRatingValues.UPPER_THRESHOLD_MIDDLE_RATING) {
+    return ProfileNames.MIN_RATING;
+  }
+  return ``;
 };
 
 export const createProfileTemplate = () => {
-  const ratingProfile = setProfileRating(countWatchedFilms);
+  const ratingProfile = getProfileRating(watchedFilmCount);
   return (
     `<section class="header__profile profile">
       <p class="profile__rating">${ratingProfile}</p>
