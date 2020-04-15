@@ -7,3 +7,10 @@ export const getRandomArrayItem = (array) => {
 export const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
+
+export const generateRandomDate = () => {
+  const currentDate = new Date();
+  currentDate.setMonth(currentDate.getMonth() - getRandomIntegerNumber(0, 1500));
+  currentDate.setMinutes(currentDate.getMinutes() - getRandomIntegerNumber(0, 1500));
+  return currentDate;
+};

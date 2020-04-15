@@ -1,21 +1,12 @@
-import {watchedFilmCount} from "../main.js";
-import {ProfileNames, ProfileRatingValues} from "../const.js";
+import {RATING_TITLES} from "../const.js";
 
 const getProfileRating = (count) => {
-  if (count > ProfileRatingValues.LOWER_THRESHOLD_MAX_RATING) {
-    return ProfileNames.MAX_RATING;
-  }
-  if (count >= ProfileRatingValues.LOWER_THRESHOLD_MIN_RATING && count <= ProfileRatingValues.UPPER_THRESHOLD_MIN_RATING) {
-    return ProfileNames.MIDDLE_RATING;
-  }
-  if (count >= ProfileRatingValues.LOWER_THRESHOLD_MIDDLE_RATING && count <= ProfileRatingValues.UPPER_THRESHOLD_MIDDLE_RATING) {
-    return ProfileNames.MIN_RATING;
-  }
-  return ``;
+  const profile = RATING_TITLES.find((item) => item.rating <= count);
+  return profile.title;
 };
 
-export const createProfileTemplate = () => {
-  const ratingProfile = getProfileRating(watchedFilmCount);
+export const createProfileTemplate = (count) => {
+  const ratingProfile = getProfileRating(count);
   return (
     `<section class="header__profile profile">
       <p class="profile__rating">${ratingProfile}</p>

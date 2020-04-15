@@ -1,3 +1,6 @@
+import {COMMENT_EMOJIS} from "../const.js";
+import {MONTH_NAMES} from "../const.js";
+
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
     return (
@@ -8,17 +11,19 @@ const createGenresTemplate = (genres) => {
 
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) => {
-    const {text, emotion, author, createDate} = comment;
+    const {text, emotion, author, date} = comment;
+    const commentDate = `${date.getFullYear()}/${date.getMonth()}/${date.getDay()}
+        ${date.getHours()}:${date.getMinutes()}`;
     return (
       `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
+              <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
             </span>
             <div>
               <p class="film-details__comment-text">${text}</p>
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${author}</span>
-                <span class="film-details__comment-day">${createDate}</span>
+                <span class="film-details__comment-day">${commentDate}</span>
                 <button class="film-details__comment-delete">Delete</button>
               </p>
             </div>
@@ -27,10 +32,43 @@ const createCommentsTemplate = (comments) => {
   }).join(`\n`);
 };
 
+const createEmojiItemTemplate = (names) => {
+  return names.map((name) => {
+    return (
+      `<input
+        class="film-details__emoji-item visually-hidden"
+        name="comment-emoji"
+        type="radio"
+        id="emoji-${name}"
+        value="${name}"
+      >
+      <label class="film-details__emoji-label" for="emoji-${name}">
+        <img src="images/emoji/${name}.png" width="30" height="30" alt="emoji">
+      </label>`
+    );
+  }).join(`\n`);
+};
+
 export const createFilmDetailsTemplate = (film) => {
-  const {poster, title, rating, duration, genres, description, comments, director, writers, actors, dateProduction, country, ageRating} = film;
-  const countComments = comments.length;
-  const descriptionFull = description.join(` `);
+  const {
+    poster,
+    title,
+    rating,
+    durationHours,
+    durationMinutes,
+    genres,
+    description,
+    comments,
+    director,
+    writers,
+    actors,
+    productionDate,
+    country,
+    ageRating
+  } = film;
+
+  const date = `${productionDate.getDay()} ${MONTH_NAMES[productionDate.getMonth()]}`;
+  const year = productionDate.getFullYear();
 
   return (
     `<section class="film-details visually-hidden">
@@ -43,7 +81,7 @@ export const createFilmDetailsTemplate = (film) => {
         <div class="film-details__poster">
           <img class="film-details__poster-img" src="${poster}" alt="">
 
-          <p class="film-details__age">${ageRating}</p>
+          <p class="film-details__age">${ageRating}+</p>
         </div>
 
         <div class="film-details__info">
@@ -73,11 +111,11 @@ export const createFilmDetailsTemplate = (film) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${dateProduction}</td>
+              <td class="film-details__cell">${date} ${year}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${duration}</td>
+              <td class="film-details__cell">${durationHours}h ${durationMinutes}m</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -92,7 +130,7 @@ export const createFilmDetailsTemplate = (film) => {
           </table>
 
           <p class="film-details__film-description">
-            ${descriptionFull}
+            ${description}
           </p>
         </div>
       </div>
@@ -111,7 +149,7 @@ export const createFilmDetailsTemplate = (film) => {
 
     <div class="form-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${countComments}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
         <ul class="film-details__comments-list">
           ${createCommentsTemplate(comments)}
@@ -125,25 +163,7 @@ export const createFilmDetailsTemplate = (film) => {
           </label>
 
           <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-            <label class="film-details__emoji-label" for="emoji-smile">
-              <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-            <label class="film-details__emoji-label" for="emoji-sleeping">
-              <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-            <label class="film-details__emoji-label" for="emoji-puke">
-              <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-            </label>
-
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-            <label class="film-details__emoji-label" for="emoji-angry">
-              <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-            </label>
+            ${createEmojiItemTemplate(COMMENT_EMOJIS)}
           </div>
         </div>
       </section>

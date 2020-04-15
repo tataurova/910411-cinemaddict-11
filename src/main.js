@@ -5,7 +5,7 @@ import {createFilmBlockTemplate} from "./components/film-block.js";
 import {createFilmListTemplate} from "./components/film-list.js";
 import {createCardTemplate} from "./components/card.js";
 import {createShowMoreButtonTemplate} from "./components/show-more-button.js";
-import {createStatsTemplate} from "./components/footer-statistic.js";
+import {createStatsTemplate} from "./components/stats.js";
 import {createFilmDetailsTemplate} from "./components/film-details.js";
 import {generateFilms} from "./mock/film.js";
 import {CardCount} from "./const.js";
@@ -20,24 +20,18 @@ const siteMainElement = document.querySelector(`.main`);
 const films = generateFilms(CardCount.MAIN);
 const filmCount = films.length;
 
-let inWatchListFilmCount = 0;
-let watchedFilmCount = 0;
-let favoriteFilmCount = 0;
+const watchStats = films.reduce((count, film) => {
+  film.isInWatchlist ? count.watchlist += 1 : count.watchlist;
+  film.isWatched ? count.history += 1 : count.history;
+  film.isFavorite ? count.favorites += 1 : count.favorites;
+  return count;
+}, {watchlist: 0,
+    history: 0,
+    favorites: 0,
+    });
 
-films.forEach((element) => {
-  if (element.isInWatchlist) {
-    inWatchListFilmCount += 1;
-  };
-  if (element.isWatched) {
-    watchedFilmCount += 1;
-  };
-  if (element.isFavorite) {
-    favoriteFilmCount += 1;
-  }
-});
-
-render(headerElement, createProfileTemplate(), `beforeend`);
-render(siteMainElement, createFilterTemplate(inWatchListFilmCount, watchedFilmCount, favoriteFilmCount), `beforeend`);
+render(headerElement, createProfileTemplate(watchStats.history), `beforeend`);
+render(siteMainElement, createFilterTemplate(watchStats.watchlist, watchStats.history, watchStats.favorites), `beforeend`);
 render(siteMainElement, createSortTemplate(), `beforeend`);
 render(siteMainElement, createFilmBlockTemplate(), `beforeend`);
 
@@ -48,10 +42,10 @@ render(filmBlockElement, createFilmListTemplate({title: `All movies. Upcoming`, 
 const filmListContainerElement = siteMainElement.querySelector(`.films-list__container`);
 const filmListElement = siteMainElement.querySelector(`.films-list`);
 
-films.slice(0, CardCount.MAIN).
+films.slice(0, CardCount.ON_START).
   forEach((film) => render(filmListContainerElement, createCardTemplate(film), `beforeend`));
 
-let showingFilmCount = CardCount.SHOWING_FILMS_COUNT_ON_START;
+let showingFilmCount = CardCount.ON_START;
 
 render(filmListElement, createShowMoreButtonTemplate(), `beforeend`);
 
@@ -68,7 +62,7 @@ films.slice(0, CardCount.COMMENTED).
 
 const footerStatisticElement = document.querySelector(`.footer__statistics`);
 
-render(footerStatisticElement, createStatsTemplate(), `beforeend`);
+render(footerStatisticElement, createStatsTemplate(filmCount), `beforeend`);
 
 const bodyElement = document.querySelector(`body`);
 render(bodyElement, createFilmDetailsTemplate(films[0]), `beforeend`);
@@ -77,7 +71,7 @@ const showMoreButtonElement = document.querySelector(`.films-list__show-more`);
 
 showMoreButtonElement.addEventListener(`click`, () => {
   const prevFilmCount = showingFilmCount;
-  showingFilmCount = showingFilmCount + CardCount.SHOWING_FILMS_COUNT_BY_BUTTON;
+  showingFilmCount = showingFilmCount + CardCount.BY_BUTTON;
 
   films.slice(prevFilmCount, showingFilmCount)
     .forEach((film) => render(filmListContainerElement, createCardTemplate(film), `beforeend`));
@@ -86,5 +80,3 @@ showMoreButtonElement.addEventListener(`click`, () => {
     showMoreButtonElement.remove();
   };
 });
-
-export {filmCount, watchedFilmCount};

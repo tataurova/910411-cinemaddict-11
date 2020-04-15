@@ -1,19 +1,4 @@
-import {getRandomArrayItem, getRandomIntegerNumber} from "./random.js";
-
-const MONTH_NAMES = [
-  `January`,
-  `February`,
-  `March`,
-  `April`,
-  `May`,
-  `June`,
-  `July`,
-  `August`,
-  `September`,
-  `October`,
-  `November`,
-  `December`,
-];
+import {getRandomArrayItem, getRandomIntegerNumber, generateRandomDate} from "./random.js";
 
 const FILM_TITLES = [
   `Ostwind 2`,
@@ -105,11 +90,11 @@ const COUNTRIES = [
 ];
 
 const AGE_RATINGS = [
-  `0+`,
-  `6+`,
-  `12+`,
-  `16+`,
-  `18+`,
+  0,
+  6,
+  12,
+  16,
+  18,
 ];
 
 const generateDescription = () => {
@@ -118,7 +103,7 @@ const generateDescription = () => {
   for (let i = 0; i < maxIndex; i++) {
     descriptionSentences.push(getRandomArrayItem(SENTENCES));
   }
-  return descriptionSentences;
+  return descriptionSentences.join(` `);
 };
 
 const generateGenre = () => {
@@ -130,28 +115,12 @@ const generateGenre = () => {
   return genreItems;
 };
 
-const generateCommentDate = () => {
-  const targetDate = new Date();
-  const differenceDate = getRandomIntegerNumber(0, 12);
-  const differenceHours = getRandomIntegerNumber(0, 24);
-  const differenceMinutes = getRandomIntegerNumber(0, 60);
-  targetDate.setDate(targetDate.getDate() - differenceDate);
-  targetDate.setHours(targetDate.getHours() - differenceHours);
-  targetDate.setMinutes(targetDate.getMinutes() - differenceMinutes);
-  const generatedDate = `${targetDate.getFullYear()}/${targetDate.getMonth()}/${targetDate.getDay()} ${targetDate.getHours()}:${targetDate.getMinutes()}`;
-  return generatedDate;
-};
-
-const generateReleaseDate = () => {
-  return `${getRandomIntegerNumber(1, 31)} ${getRandomArrayItem(MONTH_NAMES)}`;
-};
-
 const generateComment = () => {
   return {
     text: getRandomArrayItem(COMMENTS),
     emotion: getRandomArrayItem(EMOTIONS),
     author: getRandomArrayItem(AUTHORS),
-    createDate: generateCommentDate(),
+    date: generateRandomDate(),
   };
 };
 
@@ -163,21 +132,20 @@ const generateComments = (count) => {
 
 const generateFilm = () => {
   const countComments = getRandomIntegerNumber(0, 5);
-  const year = getRandomIntegerNumber(1895, 2020);
 
   return {
     poster: getRandomArrayItem(FILM_POSTERS),
     title: getRandomArrayItem(FILM_TITLES),
     rating: (Math.random() * 10).toFixed(1),
-    yearProduction: year,
-    duration: `${getRandomIntegerNumber(1, 3)}h ${getRandomIntegerNumber(0, 59)}m`,
+    durationHours: getRandomIntegerNumber(1, 3),
+    durationMinutes: getRandomIntegerNumber(0, 59),
     genres: generateGenre(),
     description: generateDescription(),
     comments: generateComments(countComments),
     director: getRandomArrayItem(DIRECTORS),
     writers: getRandomArrayItem(WRITERS),
     actors: getRandomArrayItem(ACTORS),
-    dateProduction: `${generateReleaseDate()} ${year}`,
+    productionDate: generateRandomDate(),
     country: getRandomArrayItem(COUNTRIES),
     ageRating: getRandomArrayItem(AGE_RATINGS),
     isInWatchlist: Math.random() > 0.5,
