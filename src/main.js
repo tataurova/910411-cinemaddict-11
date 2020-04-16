@@ -5,14 +5,10 @@ import {createFilmBlockTemplate} from "./components/film-block.js";
 import {createFilmListTemplate} from "./components/film-list.js";
 import {createCardTemplate} from "./components/card.js";
 import {createShowMoreButtonTemplate} from "./components/show-more-button.js";
-import {createFooterStatisticsTemplate} from "./components/footer-statistics.js";
+import {createStatsTemplate} from "./components/stats.js";
 import {createFilmDetailsTemplate} from "./components/film-details.js";
-
-const CardCount = {
-  MAIN: 5,
-  TOP: 2,
-  COMMENTED: 2
-};
+import {generateFilms} from "./mock/film.js";
+import {CardCount} from "./const.js";
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -21,21 +17,37 @@ const render = (container, template, place) => {
 const headerElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 
-render(headerElement, createProfileTemplate(), `beforeend`);
-render(siteMainElement, createFilterTemplate(), `beforeend`);
+const films = generateFilms(CardCount.MAIN);
+
+const getWatchStats = (films) => films.reduce((stats, film) => {
+  if (film.isInWatchlist) {
+    stats.watchlist += 1;
+  }
+  if (film.isWatched) {
+    stats.history += 1;
+  }
+  if (film.isFavorite) {
+    stats.favorites += 1;
+  }
+  return stats;
+}, {watchlist: 0, history: 0, favorites: 0});
+
+render(headerElement, createProfileTemplate(getWatchStats(films).history), `beforeend`);
+render(siteMainElement, createFilterTemplate(getWatchStats(films)), `beforeend`);
 render(siteMainElement, createSortTemplate(), `beforeend`);
 render(siteMainElement, createFilmBlockTemplate(), `beforeend`);
 
 const filmBlockElement = siteMainElement.querySelector(`.films`);
 
-render(filmBlockElement, createFilmListTemplate({title: `All movies. Upcoming`, isExtra: false}), `beforeend`);
+render(filmBlockElement, createFilmListTemplate({title: `All movies. Upcoming`, isExtra: false, isNoHeader: true}), `beforeend`);
 
 const filmListContainerElement = siteMainElement.querySelector(`.films-list__container`);
 const filmListElement = siteMainElement.querySelector(`.films-list`);
 
-for (let i = 0; i < CardCount.MAIN; i++) {
-  render(filmListContainerElement, createCardTemplate(), `beforeend`);
-}
+films.slice(0, CardCount.ON_START).
+  forEach((film) => render(filmListContainerElement, createCardTemplate(film), `beforeend`));
+
+let showingFilmCount = CardCount.ON_START;
 
 render(filmListElement, createShowMoreButtonTemplate(), `beforeend`);
 
@@ -45,17 +57,28 @@ render(filmBlockElement, createFilmListTemplate({title: `Most commented`, isExtr
 const filmTopListElement = siteMainElement.querySelector(`.films-list--extra:nth-child(2) .films-list__container`);
 const filmCommentedListElement = siteMainElement.querySelector(`.films-list--extra:nth-child(3) .films-list__container`);
 
-for (let i = 0; i < CardCount.TOP; i++) {
-  render(filmTopListElement, createCardTemplate(), `beforeend`);
-}
-
-for (let i = 0; i < CardCount.COMMENTED; i++) {
-  render(filmCommentedListElement, createCardTemplate(), `beforeend`);
-}
+films.slice(0, CardCount.TOP).
+  forEach((film) => render(filmTopListElement, createCardTemplate(film), `beforeend`));
+films.slice(0, CardCount.COMMENTED).
+  forEach((film) => render(filmCommentedListElement, createCardTemplate(film), `beforeend`));
 
 const footerStatisticElement = document.querySelector(`.footer__statistics`);
 
-render(footerStatisticElement, createFooterStatisticsTemplate(), `beforeend`);
+render(footerStatisticElement, createStatsTemplate(films.length), `beforeend`);
 
 const bodyElement = document.querySelector(`body`);
-render(bodyElement, createFilmDetailsTemplate(), `beforeend`);
+render(bodyElement, createFilmDetailsTemplate(films[0]), `beforeend`);
+
+const showMoreButtonElement = document.querySelector(`.films-list__show-more`);
+
+showMoreButtonElement.addEventListener(`click`, () => {
+  const prevFilmCount = showingFilmCount;
+  showingFilmCount = showingFilmCount + CardCount.BY_BUTTON;
+
+  films.slice(prevFilmCount, showingFilmCount)
+    .forEach((film) => render(filmListContainerElement, createCardTemplate(film), `beforeend`));
+
+  if (showingFilmCount >= films.length) {
+    showMoreButtonElement.remove();
+  };
+});
