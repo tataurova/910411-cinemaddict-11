@@ -12,12 +12,11 @@ const createGenresTemplate = (genres) => {
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) => {
     const {text, emotion, author, date} = comment;
-    const commentDate = `${date.getFullYear()}/${date.getMonth()}/${date.getDay()}
-        ${date.getHours()}:${date.getMinutes()}`;
+    const commentDate = new Intl.DateTimeFormat(`ja-JP`).format(date);
     return (
       `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
+              <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-{emotion}">
             </span>
             <div>
               <p class="film-details__comment-text">${text}</p>

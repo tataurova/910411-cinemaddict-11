@@ -18,20 +18,22 @@ const headerElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 
 const films = generateFilms(CardCount.MAIN);
-const filmCount = films.length;
 
-const watchStats = films.reduce((count, film) => {
-  film.isInWatchlist ? count.watchlist += 1 : count.watchlist;
-  film.isWatched ? count.history += 1 : count.history;
-  film.isFavorite ? count.favorites += 1 : count.favorites;
-  return count;
-}, {watchlist: 0,
-    history: 0,
-    favorites: 0,
-    });
+const getWatchStats = (films) => films.reduce((stats, film) => {
+  if (film.isInWatchlist) {
+    stats.watchlist += 1;
+  }
+  if (film.isWatched) {
+    stats.history += 1;
+  }
+  if (film.isFavorite) {
+    stats.favorites += 1;
+  }
+  return stats;
+}, {watchlist: 0, history: 0, favorites: 0});
 
-render(headerElement, createProfileTemplate(watchStats.history), `beforeend`);
-render(siteMainElement, createFilterTemplate(watchStats.watchlist, watchStats.history, watchStats.favorites), `beforeend`);
+render(headerElement, createProfileTemplate(getWatchStats(films).history), `beforeend`);
+render(siteMainElement, createFilterTemplate(getWatchStats(films)), `beforeend`);
 render(siteMainElement, createSortTemplate(), `beforeend`);
 render(siteMainElement, createFilmBlockTemplate(), `beforeend`);
 
@@ -62,7 +64,7 @@ films.slice(0, CardCount.COMMENTED).
 
 const footerStatisticElement = document.querySelector(`.footer__statistics`);
 
-render(footerStatisticElement, createStatsTemplate(filmCount), `beforeend`);
+render(footerStatisticElement, createStatsTemplate(films.length), `beforeend`);
 
 const bodyElement = document.querySelector(`body`);
 render(bodyElement, createFilmDetailsTemplate(films[0]), `beforeend`);

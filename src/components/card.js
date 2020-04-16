@@ -1,11 +1,9 @@
 import {MAX_LENGTH_SHOWING_TEXT} from "../const.js";
 
 const truncateDescription = (description, maxLength = MAX_LENGTH_SHOWING_TEXT) => {
-  return `<p class="film-card__description">
-          ${description.length > maxLength
-    ? `${description.slice(0, maxLength - 1)}...`
-    : description}
-        </p>`;
+  return description.length > maxLength
+    ? `description.slice(0, maxLength - 1)}...`
+    : description;
 };
 
 export const createCardTemplate = (film) => {
