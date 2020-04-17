@@ -1,5 +1,6 @@
 import {COMMENT_EMOJIS} from "../const.js";
 import {MONTH_NAMES} from "../const.js";
+import {createElement} from "../utils.js";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -48,7 +49,7 @@ const createEmojiItemTemplate = (names) => {
   }).join(`\n`);
 };
 
-export const createFilmDetailsTemplate = (film) => {
+const createFilmDetailsTemplate = (film) => {
   const {
     poster,
     title,
@@ -70,7 +71,7 @@ export const createFilmDetailsTemplate = (film) => {
   const year = productionDate.getFullYear();
 
   return (
-    `<section class="film-details visually-hidden">
+    `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="form-details__top-container">
       <div class="film-details__close">
@@ -171,3 +172,26 @@ export const createFilmDetailsTemplate = (film) => {
 </section>`
   );
 };
+
+export default class FilmDetails {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmDetailsTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

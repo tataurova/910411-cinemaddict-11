@@ -1,12 +1,13 @@
 import {MAX_LENGTH_SHOWING_TEXT} from "../const.js";
+import {createElement} from "../utils.js";
 
 const truncateDescription = (description, maxLength = MAX_LENGTH_SHOWING_TEXT) => {
   return description.length > maxLength
-    ? `description.slice(0, maxLength - 1)}...`
+    ? `${description.slice(0, maxLength - 1)}...`
     : description;
 };
 
-export const createCardTemplate = (film) => {
+const createCardTemplate = (film) => {
   const {
     poster,
     title,
@@ -42,3 +43,26 @@ export const createCardTemplate = (film) => {
     </article>`
   );
 };
+
+export default class Card {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCardTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
