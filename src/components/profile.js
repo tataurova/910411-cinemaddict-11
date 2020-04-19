@@ -1,5 +1,5 @@
 import {RATING_TITLES} from "../const.js";
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render.js";
 
 const getProfileRating = (value) => RATING_TITLES
    .find(({rating}) => rating <= value)

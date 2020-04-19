@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render.js";
 
 const createFilmListTemplate = (info) => {
   const {title, isExtra = false, isNoHeader} = info;

@@ -10,8 +10,9 @@ import StatsComponent from "./components/stats.js";
 import FilmDetailsComponent from "./components/film-details.js";
 import NoFilmsComponent from "./components/no-films.js";
 import {generateFilms} from "./mock/film.js";
-import {CardCount, KEYBOARD_KEYS} from "./const.js";
-import {render, remove, RenderPosition} from "./utils.js";
+import {CardCount, KeyboardKey} from "./const.js";
+import {render, remove, RenderPosition} from "./utils/render.js";
+import {checkIsEscKey} from "./utils/keyboard.js";
 
 const headerElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
@@ -27,9 +28,7 @@ const renderFilm = (filmListContainerElement, film) => {
   };
 
   const onEscKeyDown = (evt) => {
-    const isEscKey = (evt) => {
-      return evt.key === KEYBOARD_KEYS.ESCAPE_CODE || evt.key === KEYBOARD_KEYS.ESC_CODE;
-    };
+    const isEscKey = checkIsEscKey(evt);
 
     if (isEscKey) {
       hideFilmPopup();

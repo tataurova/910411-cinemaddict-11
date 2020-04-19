@@ -1,5 +1,5 @@
 import {MAX_LENGTH_SHOWING_TEXT} from "../const.js";
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render.js";
 
 const truncateDescription = (description, maxLength = MAX_LENGTH_SHOWING_TEXT) => {
   return description.length > maxLength

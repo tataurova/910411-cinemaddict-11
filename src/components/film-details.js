@@ -1,6 +1,6 @@
 import {COMMENT_EMOJIS} from "../const.js";
 import {MONTH_NAMES} from "../const.js";
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render.js";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {

@@ -37,7 +37,12 @@ export const COMMENT_EMOJIS = [
   `angry`,
 ];
 
-export const KEYBOARD_KEYS = {
-  ESCAPE_CODE: `Escape`,
-  ESC_CODE: `Esc`,
+export const KeyboardKey = {
+  ESCAPE: `Escape`,
+  ESC: `Esc`,
+};
+
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
 };
