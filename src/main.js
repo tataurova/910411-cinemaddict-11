@@ -8,8 +8,9 @@ import CardComponent from "./components/card.js";
 import ShowMoreButtonComponent from "./components/show-more-button.js";
 import StatsComponent from "./components/stats.js";
 import FilmDetailsComponent from "./components/film-details.js";
+import NoFilmsComponent from "./components/no-films.js";
 import {generateFilms} from "./mock/film.js";
-import {CardCount} from "./const.js";
+import {CardCount, KEYBOARD_KEYS} from "./const.js";
 import {render, remove, RenderPosition} from "./utils.js";
 
 const headerElement = document.querySelector(`.header`);
@@ -17,12 +18,23 @@ const siteMainElement = document.querySelector(`.main`);
 const footerStatisticElement = document.querySelector(`.footer__statistics`);
 
 const renderFilm = (filmListContainerElement, film) => {
-  const onFilmClick = () => {
+  const showFilmPopup = () => {
     bodyElement.appendChild(filmDetailsComponent.getElement());
   };
 
-  const onCloseButtonClick = () => {
+  const hideFilmPopup = () => {
     bodyElement.removeChild(filmDetailsComponent.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    const isEscKey = (evt) => {
+      return evt.key === KEYBOARD_KEYS.ESCAPE_CODE || evt.key === KEYBOARD_KEYS.ESC_CODE;
+    };
+
+    if (isEscKey) {
+      hideFilmPopup();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
   };
 
   const bodyElement = document.querySelector(`body`);
@@ -35,35 +47,66 @@ const renderFilm = (filmListContainerElement, film) => {
   const filmDetailsComponent = new FilmDetailsComponent(film);
   const closeButton = filmDetailsComponent.getElement().querySelector(`.film-details__close-btn`);
 
-  posterElement.addEventListener(`click`, onFilmClick);
-  filmHeaderElement.addEventListener(`click`, onFilmClick);
-  filmRatingElement.addEventListener(`click`, onFilmClick);
+  posterElement.addEventListener(`click`, () => {
+    showFilmPopup();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
 
-  closeButton.addEventListener(`click`, onCloseButtonClick);
+  filmHeaderElement.addEventListener(`click`, () => {
+    showFilmPopup();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  filmRatingElement.addEventListener(`click`, () => {
+    showFilmPopup();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  closeButton.addEventListener(`click`, () => {
+    hideFilmPopup();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
   render(filmListContainerElement, cardComponent.getElement());
 };
 
 const renderFilmBlock = (filmBlockComponent, films) => {
+  if (!films.length) {
+    render(filmBlockComponent.getElement(), new NoFilmsComponent().getElement());
+    return;
+  };
+
+  const ratingSortedFilms = films.slice();
+  const commentsSortedFilms = films.slice();
+
+  ratingSortedFilms.sort((a, b) => (b.rating - a.rating));
+  commentsSortedFilms.sort((a, b) => b.comments.length - a.comments.length);
+
   const filmListComponent = new FilmListComponent({title: `All movies. Upcoming`, isExtra: false, isNoHeader: true});
-  const filmTopListComponent = new FilmListComponent({title: `Top rated`, isExtra: true});
-  const filmCommentedListComponent = new FilmListComponent({title: `Top rated`, isExtra: true});
-
   render(filmBlockComponent.getElement(), filmListComponent.getElement());
-  render(filmBlockComponent.getElement(), filmTopListComponent.getElement());
-  render(filmBlockComponent.getElement(), filmCommentedListComponent.getElement());
-
   const filmListContainerComponent = new FilmListContainerComponent();
-  const filmTopListContainerComponent = new FilmListContainerComponent();
-  const filmCommentedContainerComponent = new FilmListContainerComponent();
-
   render(filmListComponent.getElement(), filmListContainerComponent.getElement());
-  render(filmTopListComponent.getElement(), filmTopListContainerComponent.getElement());
-  render(filmCommentedListComponent.getElement(), filmCommentedContainerComponent.getElement());
-
   films.slice(0, CardCount.ON_START).forEach((film) => renderFilm(filmListContainerComponent.getElement(), film));
-  films.slice(0, CardCount.TOP).forEach((film) => renderFilm(filmTopListContainerComponent.getElement(), film));
-  films.slice(0, CardCount.COMMENTED).forEach((film) => renderFilm(filmCommentedContainerComponent.getElement(), film));
+
+  const isFilmsNoneZeroRating = films.some((film) => film.rating > 0);
+
+  if (isFilmsNoneZeroRating) {
+    const filmTopListComponent = new FilmListComponent({title: `Top rated`, isExtra: true});
+    render(filmBlockComponent.getElement(), filmTopListComponent.getElement());
+    const filmTopListContainerComponent = new FilmListContainerComponent();
+    render(filmTopListComponent.getElement(), filmTopListContainerComponent.getElement());
+    ratingSortedFilms.slice(0, CardCount.TOP).forEach((film) => renderFilm(filmTopListContainerComponent.getElement(), film));
+  };
+
+  const ifFilmsWithComments = films.some((film) => film.comments.length);
+
+  if (ifFilmsWithComments) {
+    const filmCommentedListComponent = new FilmListComponent({title: `Most Commented`, isExtra: true});
+    render(filmBlockComponent.getElement(), filmCommentedListComponent.getElement());
+    const filmCommentedContainerComponent = new FilmListContainerComponent();
+    render(filmCommentedListComponent.getElement(), filmCommentedContainerComponent.getElement());
+    commentsSortedFilms.slice(0, CardCount.COMMENTED).forEach((film) => renderFilm(filmCommentedContainerComponent.getElement(), film));
+  };
 
   const showMoreButtonComponent = new ShowMoreButtonComponent();
   render(filmListComponent.getElement(), showMoreButtonComponent.getElement());
@@ -98,8 +141,10 @@ const getWatchStats = (films) => films.reduce((stats, film) => {
   return stats;
 }, {watchlist: 0, history: 0, favorites: 0});
 
-render(headerElement, new ProfileComponent(getWatchStats(films).history).getElement());
-render(siteMainElement, new FilterComponent(getWatchStats(films)).getElement());
+const watchStats = getWatchStats(films);
+
+render(headerElement, new ProfileComponent(watchStats).getElement());
+render(siteMainElement, new FilterComponent(watchStats).getElement());
 render(siteMainElement, new SortComponent().getElement());
 render(footerStatisticElement, new StatsComponent(films.length).getElement());
 

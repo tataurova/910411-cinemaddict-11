@@ -36,3 +36,8 @@ export const COMMENT_EMOJIS = [
   `puke`,
   `angry`,
 ];
+
+export const KEYBOARD_KEYS = {
+  ESCAPE_CODE: `Escape`,
+  ESC_CODE: `Esc`,
+};
