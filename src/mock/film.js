@@ -136,7 +136,7 @@ const generateFilm = () => {
   return {
     poster: getRandomArrayItem(FILM_POSTERS),
     title: getRandomArrayItem(FILM_TITLES),
-    rating: parseFloat((Math.random() * 10).toFixed(1)),
+    rating: getRandomIntegerNumber(0, 100) / 10,
     durationHours: getRandomIntegerNumber(1, 3),
     durationMinutes: getRandomIntegerNumber(0, 59),
     genres: generateGenre(),
