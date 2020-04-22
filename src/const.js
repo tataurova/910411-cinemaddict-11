@@ -36,3 +36,13 @@ export const COMMENT_EMOJIS = [
   `puke`,
   `angry`,
 ];
+
+export const KeyboardKey = {
+  ESCAPE: `Escape`,
+  ESC: `Esc`,
+};
+
+export const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};

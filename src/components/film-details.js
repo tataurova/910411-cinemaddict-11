@@ -1,6 +1,6 @@
 import {COMMENT_EMOJIS} from "../const.js";
 import {MONTH_NAMES} from "../const.js";
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render.js";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -97,36 +97,20 @@ const createFilmDetailsTemplate = (film) => {
           </div>
 
           <table class="film-details__table">
-            <tr class="film-details__row">
-              <td class="film-details__term">Director</td>
-              <td class="film-details__cell">${director}</td>
-            </tr>
-            <tr class="film-details__row">
-              <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${writers}</td>
-            </tr>
-            <tr class="film-details__row">
-              <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${actors}</td>
-            </tr>
-            <tr class="film-details__row">
-              <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${date} ${year}</td>
-            </tr>
-            <tr class="film-details__row">
-              <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${durationHours}h ${durationMinutes}m</td>
-            </tr>
-            <tr class="film-details__row">
-              <td class="film-details__term">Country</td>
-              <td class="film-details__cell">${country}</td>
-            </tr>
-            <tr class="film-details__row">
-              <td class="film-details__term">${genres.length === 1 ? `Genre` : `Genres`}</td>
-              <td class="film-details__cell">
-                ${createGenresTemplate(genres)}
-              </td>
-            </tr>
+            ${[
+      [`Director`, director],
+      [`Writers`, writers],
+      [`Actors`, actors],
+      [`Release Date`, `${date} ${year}`],
+      [`Runtime`, `${durationHours}h ${durationMinutes}m`],
+      [`Country`, country],
+      [genres.length === 1 ? `Genre` : `Genres`, createGenresTemplate(genres)]
+    ].map(([term, cell]) => (
+      `<tr class="film-details__row">
+                   <td class="film-details__term">${term}</td>
+                   <td class="film-details__cell">${cell}</td>
+                </tr>`
+    )).join(`\n`)}
           </table>
 
           <p class="film-details__film-description">
