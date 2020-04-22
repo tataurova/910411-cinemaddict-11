@@ -88,15 +88,11 @@ const renderFilmBlock = (filmBlockComponent, films) => {
   render(filmListComponent.getElement(), filmListContainerComponent.getElement());
   films.slice(0, CardCount.ON_START).forEach((film) => renderFilm(filmListContainerComponent.getElement(), film));
 
-  const isFilmsNoneZeroRating = films.some((film) => film.rating > 0);
-
-  if (isFilmsNoneZeroRating) {
+  if (ratingSortedFilms[0].rating > 0) {
       renderFilmListBlock({title: `Top rated`, isExtra: true}, ratingSortedFilms, CardCount.TOP);
   };
 
-  const ifFilmsWithComments = films.some((film) => film.comments.length);
-
-  if (ifFilmsWithComments) {
+  if (commentsSortedFilms[0].comments.length > 0) {
       renderFilmListBlock({title: `Most Commented`, isExtra: true}, commentsSortedFilms, CardCount.COMMENTED);
   };
 
