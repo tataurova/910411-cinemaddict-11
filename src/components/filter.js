@@ -1,4 +1,4 @@
-import {createElement} from "../utils/render.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createFilterTemplate = ({watchlist, history, favorites}) => {
   return (
@@ -14,25 +14,13 @@ const createFilterTemplate = ({watchlist, history, favorites}) => {
   );
 };
 
-export default class Filter {
+export default class Filter extends AbstractComponent {
   constructor(stats) {
+    super();
     this._stats = stats;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilterTemplate(this._stats);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

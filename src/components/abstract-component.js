@@ -1,24 +1,20 @@
 import {createElement} from "../utils/render.js";
 
-const createNoFilmsTemplate = () => {
-  return (
-    `<section class="films-list">
-      <h2 class="films-list__title">There are no movies in our database</h2>
-    </section>`
-  );
-};
-
-export default class NoFilms {
+export default class AbstractComponent {
   constructor() {
+    if (new.target === AbstractComponent) {
+      throw new Error(`Can't instantiate AbstractComponent, only concrete one.`);
+    }
+
     this._element = null;
   }
 
   getTemplate() {
-    return createNoFilmsTemplate();
+    throw new Error(`Abstract method not implemented: getTemplate`);
   }
 
   getElement() {
-    if (!this._element) {
+    if (this._element === null) {
       this._element = createElement(this.getTemplate());
     }
 

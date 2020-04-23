@@ -1,6 +1,6 @@
 import {COMMENT_EMOJIS} from "../const.js";
 import {MONTH_NAMES} from "../const.js";
-import {createElement} from "../utils/render.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -49,7 +49,7 @@ const createEmojiItemTemplate = (names) => {
   }).join(`\n`);
 };
 
-const createFilmDetailsTemplate = (film) => {
+const createFilmCardFullTemplate = (film) => {
   const {
     poster,
     title,
@@ -157,25 +157,17 @@ const createFilmDetailsTemplate = (film) => {
   );
 };
 
-export default class FilmDetails {
+export default class FilmCardFull extends AbstractComponent {
   constructor(film) {
+    super();
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film);
+    return createFilmCardFullTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setCloseButtonHandler(handler) {
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
   }
 }

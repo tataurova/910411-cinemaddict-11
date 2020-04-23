@@ -1,4 +1,4 @@
-import {createElement} from "../utils/render.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createFilmListTemplate = (info) => {
   const {title, isExtra = false, isNoHeader} = info;
@@ -9,25 +9,13 @@ const createFilmListTemplate = (info) => {
   );
 };
 
-export default class FilmList {
+export default class FilmList extends AbstractComponent {
   constructor(info) {
+    super();
     this._info = info;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmListTemplate(this._info);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from "../utils/render.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createFilmBlockTemplate = () => {
   return (
@@ -6,24 +6,8 @@ const createFilmBlockTemplate = () => {
   );
 };
 
-export default class FilmBlock {
-  constructor() {
-    this._element = null;
-  }
-
+export default class FilmBlock extends AbstractComponent {
   getTemplate() {
     return createFilmBlockTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
