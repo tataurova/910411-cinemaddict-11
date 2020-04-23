@@ -49,7 +49,7 @@ const createEmojiItemTemplate = (names) => {
   }).join(`\n`);
 };
 
-const createFilmDetailsTemplate = (film) => {
+const createFilmCardFullTemplate = (film) => {
   const {
     poster,
     title,
@@ -157,14 +157,14 @@ const createFilmDetailsTemplate = (film) => {
   );
 };
 
-export default class FilmDetails extends AbstractComponent {
+export default class FilmCardFull extends AbstractComponent {
   constructor(film) {
     super();
     this._film = film;
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._film);
+    return createFilmCardFullTemplate(this._film);
   }
 
   setCloseButtonHandler(handler) {

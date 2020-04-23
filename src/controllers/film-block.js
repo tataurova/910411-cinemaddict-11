@@ -1,21 +1,20 @@
 import FilmListComponent from "../components/film-list.js";
 import FilmListContainerComponent from "../components/film-list-container.js";
 import SortComponent from "../components/sort.js";
-import CardComponent from "../components/card.js";
-import FilmDetailsComponent from "../components/film-details.js";
+import FilmCardComponent from "../components/film-card.js";
+import FilmCardFullComponent from "../components/film-card-full.js";
 import ShowMoreButtonComponent from "../components/show-more-button.js";
-import NoFilmsComponent from "../components/no-films.js";
 import {CardCount, SortType, RenderPosition} from "../const.js";
 import {render, remove} from "../utils/render.js";
 import {isEscKey} from "../utils/keyboard.js";
 
 const renderFilm = (filmListContainerElement, film) => {
   const showFilmPopup = () => {
-    render(bodyElement, filmDetailsComponent);
+    render(bodyElement, filmCardFullComponent);
   };
 
   const hideFilmPopup = () => {
-    remove(filmDetailsComponent);
+    remove(filmCardFullComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -27,39 +26,35 @@ const renderFilm = (filmListContainerElement, film) => {
 
   const bodyElement = document.querySelector(`body`);
 
-  const cardComponent = new CardComponent(film);
-  const filmDetailsComponent = new FilmDetailsComponent(film);
+  const filmCardComponent = new FilmCardComponent(film);
+  const filmCardFullComponent = new FilmCardFullComponent(film);
 
-  cardComponent.setFilmClickHandler(() => {
+  filmCardComponent.setFilmClickHandler(() => {
     showFilmPopup();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  filmDetailsComponent.setCloseButtonHandler(() => {
+  filmCardFullComponent.setCloseButtonHandler(() => {
     hideFilmPopup();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
-  render(filmListContainerElement, cardComponent);
+  render(filmListContainerElement, filmCardComponent);
 };
 
-const getSortedFilms = (films, sortType) => {
-  let sortedFilms = [];
-  const showingFilms = films.slice();
-
+const getSortedFilms = ([...films], sortType) => {
   switch (sortType) {
     case SortType.DATE_DOWN:
-      sortedFilms = showingFilms.sort((a, b) => b.productionDate - a.productionDate);
-      break;
+      return films.sort((a, b) => b.productionDate - a.productionDate);
     case SortType.RATING_DOWN:
-      sortedFilms = showingFilms.sort((a, b) => b.rating - a.rating);
-      break;
+      return films.sort((a, b) => b.rating - a.rating);
+    case SortType.COMMENTS_DOWN:
+      return films.sort((a, b) => b.comments.length - a.comments.length);
     case SortType.DEFAULT:
-      sortedFilms = showingFilms;
-      break;
+      return films;
+    default:
+      throw new Error(`Unknown sort type: ${sortType}`);
   }
-
-  return sortedFilms;
 };
 
 const renderFilms = (filmListElement, films) => {
@@ -73,13 +68,18 @@ export default class FilmBlockController {
     this._container = container;
 
     this._sortComponent = new SortComponent();
-    this._noFilmsComponent = new NoFilmsComponent();
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
   }
 
   render(films) {
     const container = this._container.getElement();
     render(container, this._sortComponent, RenderPosition.BEFOREBEGIN);
+
+    if (films.length === 0) {
+      const filmListComponentNoFilms = new FilmListComponent({title: `There are no movies in our database`});
+      render(container, filmListComponentNoFilms);
+      return;
+    }
 
     let showingFilmCount = CardCount.ON_START;
 
@@ -88,7 +88,7 @@ export default class FilmBlockController {
 
       this._showMoreButtonComponent.setClickHandler(() => {
         const prevFilmCount = showingFilmCount;
-        showingFilmCount = showingFilmCount + CardCount.BY_BUTTON;
+        showingFilmCount += CardCount.BY_BUTTON;
 
         renderFilms(filmListContainerElement, films.slice(prevFilmCount, showingFilmCount));
 
@@ -98,37 +98,31 @@ export default class FilmBlockController {
       });
     };
 
-    if (films.length === 0) {
-      render(this._container, this._noFilmsComponent);
-      return;
-    }
+    const ratingSortedFilms = getSortedFilms(films, SortType.RATING_DOWN);
+    const commentsSortedFilms = getSortedFilms(films, SortType.COMMENTS_DOWN);
 
-    const ratingSortedFilms = films.slice();
-    const commentsSortedFilms = films.slice();
-
-    ratingSortedFilms.sort((a, b) => b.rating - a.rating);
-    commentsSortedFilms.sort((a, b) => b.comments.length - a.comments.length);
-
-    const renderFilmListContainer = ({title, isExtra}, filmsForBlock, count) => {
+    const renderFilmListContainer = ({title, isExtra}) => {
       const filmListComponent = new FilmListComponent({title, isExtra});
       const filmListContainerComponent = new FilmListContainerComponent();
 
       render(container, filmListComponent);
       render(filmListComponent.getElement(), filmListContainerComponent);
-      renderFilms(filmListContainerComponent.getElement(), filmsForBlock.slice(0, count));
 
       return filmListContainerComponent.getElement();
     };
 
     const filmListContainerElement = renderFilmListContainer({title: `All movies. Upcoming`, isExtra: false,
       isNoHeader: true}, films, CardCount.ON_START);
+    renderFilms(filmListContainerElement, films.slice(0, CardCount.ON_START));
 
     if (ratingSortedFilms[0].rating > 0) {
-      renderFilmListContainer({title: `Top rated`, isExtra: true}, ratingSortedFilms, CardCount.TOP);
+      const filmTopListContainerElement = renderFilmListContainer({title: `Top rated`, isExtra: true});
+      renderFilms(filmTopListContainerElement, ratingSortedFilms.slice(0, CardCount.TOP));
     }
 
     if (commentsSortedFilms[0].comments.length > 0) {
-      renderFilmListContainer({title: `Most Commented`, isExtra: true}, commentsSortedFilms, CardCount.COMMENTED);
+      const filmCommentedListContainerElement = renderFilmListContainer({title: `Most Commented`, isExtra: true});
+      renderFilms(filmCommentedListContainerElement, commentsSortedFilms.slice(0, CardCount.COMMENTED));
     }
 
     renderShowMoreButton();
@@ -142,8 +136,6 @@ export default class FilmBlockController {
 
       renderFilms(filmListContainerElement, sortedFilms.slice(0, showingFilmCount));
       renderShowMoreButton();
-
-      films = sortedFilms;
     });
   }
 }

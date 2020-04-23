@@ -7,7 +7,7 @@ const truncateDescription = (description, maxLength = MAX_LENGTH_SHOWING_TEXT) =
     : description;
 };
 
-const createCardTemplate = (film) => {
+const createFilmCardTemplate = (film) => {
   const {
     poster,
     title,
@@ -44,19 +44,20 @@ const createCardTemplate = (film) => {
   );
 };
 
-export default class Card extends AbstractComponent {
+export default class FilmCard extends AbstractComponent {
   constructor(film) {
     super();
     this._film = film;
   }
 
   getTemplate() {
-    return createCardTemplate(this._film);
+    return createFilmCardTemplate(this._film);
   }
 
   setFilmClickHandler(handler) {
-    this.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, handler);
-    this.getElement().querySelector(`.film-card__title`).addEventListener(`click`, handler);
-    this.getElement().querySelector(`.film-card__rating`).addEventListener(`click`, handler);
+    const element = this.getElement();
+    element.querySelector(`.film-card__poster`).addEventListener(`click`, handler);
+    element.querySelector(`.film-card__title`).addEventListener(`click`, handler);
+    element.querySelector(`.film-card__comments`).addEventListener(`click`, handler);
   }
 }
