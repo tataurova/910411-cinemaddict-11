@@ -44,5 +44,13 @@ export const KeyboardKey = {
 
 export const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
+  BEFOREBEGIN: `beforebegin`,
   BEFOREEND: `beforeend`
+};
+
+
+export const SortType = {
+  DATE_DOWN: `date-down`,
+  RATING_DOWN: `rating-down`,
+  DEFAULT: `default`,
 };

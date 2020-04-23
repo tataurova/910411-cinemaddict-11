@@ -1,5 +1,5 @@
 import {MAX_LENGTH_SHOWING_TEXT} from "../const.js";
-import {createElement} from "../utils/render.js";
+import AbstractComponent from "./abstract-component.js";
 
 const truncateDescription = (description, maxLength = MAX_LENGTH_SHOWING_TEXT) => {
   return description.length > maxLength
@@ -44,25 +44,19 @@ const createCardTemplate = (film) => {
   );
 };
 
-export default class Card {
+export default class Card extends AbstractComponent {
   constructor(film) {
+    super();
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
     return createCardTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setFilmClickHandler(handler) {
+    this.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`.film-card__title`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`.film-card__rating`).addEventListener(`click`, handler);
   }
 }
