@@ -54,3 +54,8 @@ export const SortType = {
   RATING_DOWN: `rating-down`,
   DEFAULT: `default`,
 };
+
+export const ViewMode = {
+  DEFAULT: `default`,
+  POPUP: `popup`,
+};
