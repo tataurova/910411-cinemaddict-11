@@ -229,5 +229,5 @@ export default class FilmCardFull extends AbstractSmartComponent {
     element.querySelector(`#emoji-angry`).addEventListener(`click`, () => {
       rerenderWithCommentEmoji(`angry`);
     });
-  };
+  }
 }

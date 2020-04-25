@@ -27,7 +27,7 @@ const renderFilms = (filmListElement, films, onDataChange, onViewChange) => {
     filmController.render(film);
 
     return filmController;
-  })
+  });
 };
 
 export default class FilmBlockController {
@@ -80,7 +80,7 @@ export default class FilmBlockController {
       isNoHeader: true}, films, CardCount.ON_START);
 
     const newFilms = renderFilms(filmListContainerComponent.getElement(),
-      this._films.slice(0, CardCount.ON_START), this._onDataChange, this._onViewChange);
+        this._films.slice(0, CardCount.ON_START), this._onDataChange, this._onViewChange);
     this._showedFilmControllers = this._showedFilmControllers.concat(newFilms);
 
     this._filmListContainerComponent = filmListContainerComponent;
@@ -88,26 +88,25 @@ export default class FilmBlockController {
     if (ratingSortedFilms[0].rating > 0) {
       const filmTopListContainerComponent = renderFilmListContainer({title: `Top rated`, isExtra: true});
 
-      const newFilms = renderFilms(filmTopListContainerComponent.getElement(),
-        ratingSortedFilms.slice(0, CardCount.TOP), this._onDataChange, this._onViewChange);
+      const newTopFilms = renderFilms(filmTopListContainerComponent.getElement(),
+          ratingSortedFilms.slice(0, CardCount.TOP), this._onDataChange, this._onViewChange);
 
-      this._showedFilmControllers = this._showedFilmControllers.concat(newFilms);
+      this._showedFilmControllers = this._showedFilmControllers.concat(newTopFilms);
     }
 
     if (commentsSortedFilms[0].comments.length > 0) {
       const filmCommentedListContainerComponent = renderFilmListContainer({title: `Most Commented`, isExtra: true});
 
-      const newFilms = renderFilms(filmCommentedListContainerComponent.getElement(),
-        commentsSortedFilms.slice(0, CardCount.COMMENTED), this._onDataChange, this._onViewChange);
+      const newCommentedFilms = renderFilms(filmCommentedListContainerComponent.getElement(),
+          commentsSortedFilms.slice(0, CardCount.COMMENTED), this._onDataChange, this._onViewChange);
 
-      this._showedFilmControllers = this._showedFilmControllers.concat(newFilms);
+      this._showedFilmControllers = this._showedFilmControllers.concat(newCommentedFilms);
     }
 
     this._renderShowMoreButton();
   }
 
   _renderShowMoreButton() {
-    const container = this._container.getElement();
     const filmListContainerElement = this._filmListContainerComponent.getElement();
 
     render(filmListContainerElement, this._showMoreButtonComponent, RenderPosition.AFTERBEGIN);
@@ -119,7 +118,7 @@ export default class FilmBlockController {
       const sortedFilms = getSortedFilms(this._films, this._sortComponent.getSortType());
 
       const newFilms = renderFilms(filmListContainerElement,
-        sortedFilms.slice(prevFilmCount, this._showingFilmCount), this._onDataChange, this._onViewChange);
+          sortedFilms.slice(prevFilmCount, this._showingFilmCount), this._onDataChange, this._onViewChange);
 
       this._showedFilmControllers = this._showedFilmControllers.concat(newFilms);
 
@@ -127,7 +126,7 @@ export default class FilmBlockController {
         remove(this._showMoreButtonComponent);
       }
     });
-  };
+  }
 
   _onDataChange(filmController, oldData, newData) {
     const index = this._films.findIndex((film) => film === oldData);

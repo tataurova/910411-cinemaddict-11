@@ -1,7 +1,7 @@
 import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
 import {render, remove, replace} from "../utils/render.js";
-import {RenderPosition, ViewMode} from "../const.js";
+import {ViewMode} from "../const.js";
 import {isEscKey} from "../utils/keyboard.js";
 
 export default class FilmController {
@@ -79,7 +79,6 @@ export default class FilmController {
     if (oldFilmCardComponent && oldFilmCardFullComponent) {
       replace(this._filmCardComponent, oldFilmCardComponent);
       replace(this._filmCardFullComponent, oldFilmCardFullComponent);
-      console.log('реплейс');
     } else {
       render(this._container, this._filmCardComponent);
     }
@@ -97,18 +96,18 @@ export default class FilmController {
     this._viewMode = ViewMode.POPUP;
     const bodyElement = document.querySelector(`body`);
     render(bodyElement, this._filmCardFullComponent);
-  };
+  }
 
   _hideFilmPopup() {
     this._filmCardFullComponent.reset();
     this._viewMode = ViewMode.DEFAULT;
     remove(this._filmCardFullComponent);
-  };
+  }
 
   _onEscKeyDown(evt) {
     if (isEscKey(evt)) {
       this._hideFilmPopup();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
-  };
+  }
 }

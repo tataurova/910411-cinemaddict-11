@@ -1,5 +1,4 @@
 import AbstractComponent from "./abstract-component.js";
-import {replace} from "../utils/render";
 
 export default class AbstractSmartComponent extends AbstractComponent {
   recoveryListeners() {
@@ -20,8 +19,6 @@ export default class AbstractSmartComponent extends AbstractComponent {
   }
 
   reset() {
-    const film = this.film;
-
     this.rerender();
   }
 }
