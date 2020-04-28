@@ -10,6 +10,15 @@ const createGenresTemplate = (genres) => {
   }).join(`\n`);
 };
 
+const createEmojiImage = (name) => {
+  const image = document.createElement(`img`);
+  image.width = 55;
+  image.height = 55;
+  image.src = `images/emoji/${name}.png`;
+  image.alt = `emoji-${name}`;
+  return image;
+};
+
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) => {
     const {text, emotion, author, date} = comment;
@@ -143,8 +152,7 @@ const createFilmCardFullTemplate = (film, options) => {
         <ul class="film-details__comments-list">
           ${createCommentsTemplate(comments)}
         </ul>
-
-        <div class="film-details__new-comment">
+         <div class="film-details__new-comment">
           <div for="add-emoji" class="film-details__add-emoji-label">
           ${isEmoji ? `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="emoji-${emojiName}">` : ``}</div>
 
@@ -169,10 +177,16 @@ export default class FilmCardFull extends AbstractSmartComponent {
     this._film = film;
 
     this._isEmoji = false;
-    this._emojiName = null;
+    this._emojiName = ``;
 
     this._closeButtonHandler = null;
+    this._setControlButtonsChangeHandler = null;
     this._subscribeOnEvents();
+
+  }
+
+  rerenderComments() {
+    this._newComment.rerender();
   }
 
   getTemplate() {
@@ -181,53 +195,53 @@ export default class FilmCardFull extends AbstractSmartComponent {
 
   recoveryListeners() {
     this.setCloseButtonHandler(this._closeButtonHandler);
+    this.setControlButtonsChangeHandler(this._setControlButtonsChangeHandler);
     this._subscribeOnEvents();
-  }
-
-  rerender() {
-    super.rerender();
   }
 
   setCloseButtonHandler(handler) {
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
-
     this._closeButtonHandler = handler;
   }
 
-  setAddToWatchlistButtonClickHandler(handler) {
-    this.getElement().querySelector(`#watchlist`).addEventListener(`click`, handler);
-  }
-
-  setMarkAsWatchedButtonClickHandler(handler) {
-    this.getElement().querySelector(`#watched`).addEventListener(`click`, handler);
-  }
-
-  setFavoriteButtonClickHandler(handler) {
-    this.getElement().querySelector(`#favorite`).addEventListener(`click`, handler);
+  setControlButtonsChangeHandler(handler) {
+    this.getElement().querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+      if (evt.target.id === `watchlist`) {
+        handler(Object.assign({}, this._film, {
+          isInWatchlist: !this._film.isInWatchlist,
+        }));
+      }
+      if (evt.target.id === `watched`) {
+        handler(Object.assign({}, this._film, {
+          isWatched: !this._film.isWatched,
+        }));
+      }
+      if (evt.target.id === `favorite`) {
+        handler(Object.assign({}, this._film, {
+          isFavorite: !this._film.isFavorite,
+        }));
+      }
+    });
+    this._setControlButtonsChangeHandler = handler;
   }
 
   _subscribeOnEvents() {
     const element = this.getElement();
+    const imageBlockElement = element.querySelector(`.film-details__add-emoji-label`);
+    const text = element.querySelector(`.film-details__comment-input`);
+
     const rerenderWithCommentEmoji = (name) => {
       this._isEmoji = true;
       this._emojiName = name;
-      this.rerender();
+      const image = createEmojiImage(name);
+      imageBlockElement.innerHTML = ``;
+      imageBlockElement.appendChild(image);
+      text.textContent = `Great movie!`;
     };
 
-    element.querySelector(`#emoji-smile`).addEventListener(`click`, () => {
-      rerenderWithCommentEmoji(`smile`);
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
+      rerenderWithCommentEmoji(evt.target.value);
     });
 
-    element.querySelector(`#emoji-sleeping`).addEventListener(`click`, () => {
-      rerenderWithCommentEmoji(`sleeping`);
-    });
-
-    element.querySelector(`#emoji-puke`).addEventListener(`click`, () => {
-      rerenderWithCommentEmoji(`puke`);
-    });
-
-    element.querySelector(`#emoji-angry`).addEventListener(`click`, () => {
-      rerenderWithCommentEmoji(`angry`);
-    });
   }
 }

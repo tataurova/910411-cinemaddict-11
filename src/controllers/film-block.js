@@ -5,21 +5,7 @@ import ShowMoreButtonComponent from "../components/show-more-button.js";
 import FilmController from "./film.js";
 import {CardCount, SortType, RenderPosition} from "../const.js";
 import {render, remove} from "../utils/render.js";
-
-const getSortedFilms = ([...films], sortType) => {
-  switch (sortType) {
-    case SortType.DATE_DOWN:
-      return films.sort((a, b) => b.productionDate - a.productionDate);
-    case SortType.RATING_DOWN:
-      return films.sort((a, b) => b.rating - a.rating);
-    case SortType.COMMENTS_DOWN:
-      return films.sort((a, b) => b.comments.length - a.comments.length);
-    case SortType.DEFAULT:
-      return films;
-    default:
-      throw new Error(`Unknown sort type: ${sortType}`);
-  }
-};
+import {getSortedFilms} from "../utils/sort.js";
 
 const renderFilms = (filmListElement, films, onDataChange, onViewChange) => {
   return films.map((film) => {
@@ -49,13 +35,11 @@ export default class FilmBlockController {
 
     this._filmListContainerComponent = null;
 
-    this._showedRatingSortedFilmControllers = null;
-    this._showedCommentsSortedFilmControllers = null;
+    this._showedTopFilmControllers = [];
+    this._showedCommentsFilmControllers = [];
   }
 
   render(films) {
-    this._films = films;
-
     const container = this._container.getElement();
 
     render(container, this._sortComponent, RenderPosition.BEFOREBEGIN);
@@ -65,6 +49,8 @@ export default class FilmBlockController {
       render(container, filmListComponentNoFilms);
       return;
     }
+
+    this._films = films;
 
     const ratingSortedFilms = getSortedFilms(films, SortType.RATING_DOWN);
     const commentsSortedFilms = getSortedFilms(films, SortType.COMMENTS_DOWN);
@@ -83,7 +69,7 @@ export default class FilmBlockController {
     };
 
     const filmListContainerComponent = renderFilmListContainer({title: `All movies. Upcoming`, isExtra: false,
-      isNoHeader: true}, films, CardCount.ON_START);
+      isNoHeader: true});
 
     const newFilms = renderFilms(filmListContainerComponent.getElement(),
         this._films.slice(0, CardCount.ON_START), this._onDataChange, this._onViewChange);
@@ -97,7 +83,7 @@ export default class FilmBlockController {
       const newTopFilms = renderFilms(filmTopListContainerComponent.getElement(),
           ratingSortedFilms.slice(0, CardCount.TOP), this._onDataChange, this._onViewChange);
 
-      this._showedRatingSortedFilmControllers = newTopFilms;
+      this._showedTopFilmControllers = newTopFilms;
 
       this._showedFilmControllers = this._showedFilmControllers.concat(newTopFilms);
     }
@@ -108,7 +94,7 @@ export default class FilmBlockController {
       const newCommentedFilms = renderFilms(filmCommentedListContainerComponent.getElement(),
           commentsSortedFilms.slice(0, CardCount.COMMENTED), this._onDataChange, this._onViewChange);
 
-      this._showedCommentsSortedFilmControllers = newCommentedFilms;
+      this._showedCommentsFilmControllers = newCommentedFilms;
 
       this._showedFilmControllers = this._showedFilmControllers.concat(newCommentedFilms);
     }
@@ -140,16 +126,15 @@ export default class FilmBlockController {
 
   _onDataChange(filmController, oldData, newData) {
     const index = this._films.findIndex((film) => film === oldData);
-    const showedFilmControllers = this._showedFilmControllers.filter((el) => el._filmCardComponent._film === oldData);
-
-    if (index !== -1) {
+    const showedFilmControllers = this._showedFilmControllers.filter((controller) => controller.getFilm() === oldData);
+    if (index > -1) {
       this._films = [].concat(this._films.slice(0, index), newData, this._films.slice(index + 1));
-      showedFilmControllers.forEach((el) => el.render(this._films[index]));
+      showedFilmControllers.forEach((controller) => controller.render(this._films[index]));
     }
   }
 
   _onViewChange() {
-    this._showedFilmControllers.forEach((it) => it.setDefaultView());
+    this._showedFilmControllers.forEach((controller) => controller.setDefaultView());
   }
 
   _onSortTypeChange(sortType) {
@@ -162,10 +147,13 @@ export default class FilmBlockController {
     filmListContainerElement.innerHTML = ``;
 
     const newFilms = renderFilms(filmListContainerElement, sortedFilms.slice(0, this._showingFilmCount), this._onDataChange, this._onViewChange);
-    this._showedFilmControllers = newFilms.concat(this._showedRatingSortedFilmControllers).concat(this._showedCommentsSortedFilmControllers);
+
+    this._showedFilmControllers = newFilms.concat(
+        this._showedTopFilmControllers,
+        this._showedCommentsFilmControllers
+    );
 
     this._renderShowMoreButton();
   }
 
 }
-

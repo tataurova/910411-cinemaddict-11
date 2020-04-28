@@ -1,6 +1,17 @@
 import {MAX_LENGTH_SHOWING_TEXT} from "../const.js";
 import AbstractComponent from "./abstract-component.js";
 
+const createButtonMarkup = (name, text, isPressed) => {
+  return (
+    `<button class="film-card__controls-item button film-card__controls-item--${name}
+     ${
+    isPressed ? `film-card__controls-item--active`
+      : ``
+    }
+      ">${text}</button>`
+  );
+};
+
 const truncateDescription = (description, maxLength = MAX_LENGTH_SHOWING_TEXT) => {
   return description.length > maxLength
     ? `${description.slice(0, maxLength - 1)}...`
@@ -24,6 +35,9 @@ const createFilmCardTemplate = (film) => {
   } = film;
 
   const year = productionDate.getFullYear();
+  const addToWatchListButton = createButtonMarkup(`add-to-watchlist`, `Add to watchlist`, isInWatchlist);
+  const markAsWatchedButton = createButtonMarkup(`mark-as-watched`, `Mark as watched`, isWatched);
+  const addToFavoriteButton = createButtonMarkup(`favorite`, `Mark as favorite`, isFavorite);
   return (
     `<article class="film-card">
       <h3 class="film-card__title">${title}</h3>
@@ -38,11 +52,11 @@ const createFilmCardTemplate = (film) => {
         ${truncateDescription(description)}
       </p>
       <a class="film-card__comments">${comments.length} comments</a>
-      <div class="film-card__controls">
-        <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${isInWatchlist ? `film-card__controls-item--active` : ``}">Add to watchlist</button>
-        <button class="film-card__controls-item button film-card__controls-item--mark-as-watched ${isWatched ? `film-card__controls-item--active` : ``}">Mark as watched</button>
-        <button class="film-card__controls-item button film-card__controls-item--favorite ${isFavorite ? `film-card__controls-item--active` : ``}">Mark as favorite</button>
-      </div>
+      <form class="film-card__controls">
+        ${addToWatchListButton}
+        ${markAsWatchedButton}
+        ${addToFavoriteButton}
+      </form>
     </article>`
   );
 };
@@ -51,6 +65,10 @@ export default class FilmCard extends AbstractComponent {
   constructor(film) {
     super();
     this._film = film;
+  }
+
+  getFilmData() {
+    return this._film;
   }
 
   getTemplate() {

@@ -1,16 +1,19 @@
 import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
 import {render, remove, replace} from "../utils/render.js";
-import {ViewMode} from "../const.js";
+import {FilmCardViewMode} from "../const.js";
 import {isEscKey} from "../utils/keyboard.js";
+
+const bodyElement = document.querySelector(`body`);
 
 export default class FilmController {
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
+    this._film = null;
 
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
-    this._viewMode = ViewMode.DEFAULT;
+    this._filmCardViewMode = FilmCardViewMode.DEFAULT;
 
     this._filmCardComponent = null;
     this._filmCardFullComponent = null;
@@ -21,6 +24,7 @@ export default class FilmController {
   }
 
   render(film) {
+    this._film = film;
     const oldFilmCardComponent = this._filmCardComponent;
     const oldFilmCardFullComponent = this._filmCardFullComponent;
 
@@ -29,12 +33,10 @@ export default class FilmController {
 
     this._filmCardComponent.setFilmClickHandler(() => {
       this._showFilmPopup();
-      document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
     this._filmCardFullComponent.setCloseButtonHandler(() => {
       this._hideFilmPopup();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
 
@@ -56,25 +58,9 @@ export default class FilmController {
       }));
     });
 
-
-    this._filmCardFullComponent.setAddToWatchlistButtonClickHandler(() => {
-      this._onDataChange(this, film, Object.assign({}, film, {
-        isInWatchlist: !film.isInWatchlist,
-      }));
+    this._filmCardFullComponent.setControlButtonsChangeHandler((newFilm) => {
+      this._onDataChange(this, film, newFilm);
     });
-
-    this._filmCardFullComponent.setMarkAsWatchedButtonClickHandler(() => {
-      this._onDataChange(this, film, Object.assign({}, film, {
-        isWatched: !film.isWatched,
-      }));
-    });
-
-    this._filmCardFullComponent.setFavoriteButtonClickHandler(() => {
-      this._onDataChange(this, film, Object.assign({}, film, {
-        isFavorite: !film.isFavorite,
-      }));
-    });
-
 
     if (oldFilmCardComponent && oldFilmCardFullComponent) {
       replace(this._filmCardComponent, oldFilmCardComponent);
@@ -86,28 +72,32 @@ export default class FilmController {
   }
 
   setDefaultView() {
-    if (this._viewMode !== ViewMode.DEFAULT) {
+    if (this._filmCardViewMode !== FilmCardViewMode.DEFAULT) {
       this._hideFilmPopup();
     }
   }
 
   _showFilmPopup() {
     this._onViewChange();
-    this._viewMode = ViewMode.POPUP;
-    const bodyElement = document.querySelector(`body`);
+    this._filmCardViewMode = FilmCardViewMode.POPUP;
     render(bodyElement, this._filmCardFullComponent);
+    document.addEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _hideFilmPopup() {
-    this._filmCardFullComponent.reset();
-    this._viewMode = ViewMode.DEFAULT;
+    this._filmCardViewMode = FilmCardViewMode.DEFAULT;
     remove(this._filmCardFullComponent);
+    this.render(this._film);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _onEscKeyDown(evt) {
     if (isEscKey(evt)) {
       this._hideFilmPopup();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
+  }
+
+  getFilm() {
+    return this._filmCardComponent.getFilmData();
   }
 }
