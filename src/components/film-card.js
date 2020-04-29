@@ -35,7 +35,7 @@ const createFilmCardTemplate = (film) => {
   } = film;
 
   const year = moment(productionDate).format(`gggg`);
-  const durationHours = moment.utc(moment.duration(durationMinutes, "minutes").asMilliseconds()).format("H[h] mm[m]");
+  const durationHours = moment.utc(moment.duration(durationMinutes, `minutes`).asMilliseconds()).format(`H[h] mm[m]`);
   const addToWatchListButton = createButtonMarkup(`add-to-watchlist`, `Add to watchlist`, isInWatchlist);
   const markAsWatchedButton = createButtonMarkup(`mark-as-watched`, `Mark as watched`, isWatched);
   const addToFavoriteButton = createButtonMarkup(`favorite`, `Mark as favorite`, isFavorite);
