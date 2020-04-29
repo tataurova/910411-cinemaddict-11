@@ -79,7 +79,7 @@ const createFilmCardFullTemplate = (film, options) => {
     isFavorite,
   } = film;
 
-  const {isEmoji, emojiName} = options;
+  const {emojiName} = options;
 
   const date = moment(productionDate).format(`D MMMM`);
   const year = moment(productionDate).format(`gggg`);
@@ -155,10 +155,10 @@ const createFilmCardFullTemplate = (film, options) => {
         </ul>
          <div class="film-details__new-comment">
           <div for="add-emoji" class="film-details__add-emoji-label">
-          ${isEmoji ? `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="emoji-${emojiName}">` : ``}</div>
+          ${emojiName.length > 0 ? `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="emoji-${emojiName}">` : ``}</div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${isEmoji ? `Great movie!` : ``}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${emojiName.length > 0 ? `Great movie!` : ``}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -177,7 +177,6 @@ export default class FilmCardFull extends AbstractSmartComponent {
     super();
     this._film = film;
 
-    this._isEmoji = false;
     this._emojiName = ``;
 
     this._closeButtonHandler = null;
@@ -187,7 +186,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createFilmCardFullTemplate(this._film, {isEmoji: this._isEmoji, emojiName: this._emojiName});
+    return createFilmCardFullTemplate(this._film, {emojiName: this._emojiName});
   }
 
   recoveryListeners() {
@@ -196,39 +195,12 @@ export default class FilmCardFull extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
-  setCloseButtonHandler(handler) {
-    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
-    this._closeButtonHandler = handler;
-  }
-
-  setControlButtonsChangeHandler(handler) {
-    this.getElement().querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
-      if (evt.target.id === `watchlist`) {
-        handler(Object.assign({}, this._film, {
-          isInWatchlist: !this._film.isInWatchlist,
-        }));
-      }
-      if (evt.target.id === `watched`) {
-        handler(Object.assign({}, this._film, {
-          isWatched: !this._film.isWatched,
-        }));
-      }
-      if (evt.target.id === `favorite`) {
-        handler(Object.assign({}, this._film, {
-          isFavorite: !this._film.isFavorite,
-        }));
-      }
-    });
-    this._setControlButtonsChangeHandler = handler;
-  }
-
   _subscribeOnEvents() {
     const element = this.getElement();
     const imageBlockElement = element.querySelector(`.film-details__add-emoji-label`);
     const text = element.querySelector(`.film-details__comment-input`);
 
     const rerenderWithCommentEmoji = (name) => {
-      this._isEmoji = true;
       this._emojiName = name;
       const image = createEmojiImage(name);
       imageBlockElement.innerHTML = ``;
@@ -240,5 +212,17 @@ export default class FilmCardFull extends AbstractSmartComponent {
       rerenderWithCommentEmoji(evt.target.value);
     });
 
+  }
+
+  setCloseButtonHandler(handler) {
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
+    this._closeButtonHandler = handler;
+  }
+
+  setControlButtonsChangeHandler(handler) {
+    this.getElement().querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+      handler(evt.target.id);
+    });
+    this._setControlButtonsChangeHandler = handler;
   }
 }

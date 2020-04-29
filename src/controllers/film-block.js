@@ -40,7 +40,7 @@ export default class FilmBlockController {
   }
 
   render(films) {
-    const container = this._container.getElement();
+    const container = this._container;
 
     render(container, this._sortComponent, RenderPosition.BEFOREBEGIN);
 
@@ -142,11 +142,10 @@ export default class FilmBlockController {
 
     const sortedFilms = getSortedFilms(this._films, sortType);
 
-    const filmListContainerElement = this._filmListContainerComponent.getElement();
+    this._filmListContainerComponent.clear();
 
-    filmListContainerElement.innerHTML = ``;
-
-    const newFilms = renderFilms(filmListContainerElement, sortedFilms.slice(0, this._showingFilmCount), this._onDataChange, this._onViewChange);
+    const newFilms = renderFilms(this._filmListContainerComponent.getElement(),
+      sortedFilms.slice(0, this._showingFilmCount), this._onDataChange, this._onViewChange);
 
     this._showedFilmControllers = newFilms.concat(
         this._showedTopFilmControllers,

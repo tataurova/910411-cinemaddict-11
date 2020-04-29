@@ -14,8 +14,4 @@ export default class AbstractSmartComponent extends AbstractComponent {
 
     this.recoveryListeners();
   }
-
-  reset() {
-    this.rerender();
-  }
 }

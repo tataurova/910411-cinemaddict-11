@@ -1,10 +1,8 @@
 import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
 import {render, remove, replace} from "../utils/render.js";
-import {FilmCardViewMode} from "../const.js";
+import {FilmCardViewMode as ViewMode, ButtonID} from "../const.js";
 import {isEscKey} from "../utils/keyboard.js";
-
-const bodyElement = document.querySelector(`body`);
 
 export default class FilmController {
   constructor(container, onDataChange, onViewChange) {
@@ -13,7 +11,7 @@ export default class FilmController {
 
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
-    this._filmCardViewMode = FilmCardViewMode.DEFAULT;
+    this._mode = ViewMode.DEFAULT;
 
     this._filmCardComponent = null;
     this._filmCardFullComponent = null;
@@ -31,14 +29,13 @@ export default class FilmController {
     this._filmCardComponent = new FilmCardComponent(film);
     this._filmCardFullComponent = new FilmCardFullComponent(film);
 
-    this._filmCardComponent.setFilmClickHandler(() => {
+    this._filmCardComponent.setClickHandler(() => {
       this._showFilmPopup();
     });
 
     this._filmCardFullComponent.setCloseButtonHandler(() => {
       this._hideFilmPopup();
     });
-
 
     this._filmCardComponent.setAddToWatchlistButtonClickHandler(() => {
       this._onDataChange(this, film, Object.assign({}, film, {
@@ -58,8 +55,22 @@ export default class FilmController {
       }));
     });
 
-    this._filmCardFullComponent.setControlButtonsChangeHandler((newFilm) => {
-      this._onDataChange(this, film, newFilm);
+    this._filmCardFullComponent.setControlButtonsChangeHandler((buttonID) => {
+      if (buttonID === ButtonID.WATCHLIST) {
+        this._onDataChange(this, film, (Object.assign({}, this._film, {
+          isInWatchlist: !this._film.isInWatchlist,
+        })));
+      }
+      if (buttonID === ButtonID.WATCHED) {
+        this._onDataChange(this, film, (Object.assign({}, this._film, {
+          isWatched: !this._film.isWatched,
+        })));
+      }
+      if (buttonID === ButtonID.FAVORITE) {
+        this._onDataChange(this, film, (Object.assign({}, this._film, {
+          isFavorite: !this._film.isFavorite,
+        })));
+      }
     });
 
     if (oldFilmCardComponent && oldFilmCardFullComponent) {
@@ -71,23 +82,28 @@ export default class FilmController {
 
   }
 
+
+  getFilm() {
+    return this._filmCardComponent.getFilmData();
+  }
+
   setDefaultView() {
-    if (this._filmCardViewMode !== FilmCardViewMode.DEFAULT) {
+    if (this._mode !== ViewMode.DEFAULT) {
       this._hideFilmPopup();
     }
   }
 
   _showFilmPopup() {
     this._onViewChange();
-    this._filmCardViewMode = FilmCardViewMode.POPUP;
-    render(bodyElement, this._filmCardFullComponent);
+    this._mode = ViewMode.POPUP;
+    this._filmCardFullComponent.rerender();
+    render(this._container, this._filmCardFullComponent);
     document.addEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _hideFilmPopup() {
-    this._filmCardViewMode = FilmCardViewMode.DEFAULT;
+    this._mode = ViewMode.DEFAULT;
     remove(this._filmCardFullComponent);
-    this.render(this._film);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
@@ -95,9 +111,5 @@ export default class FilmController {
     if (isEscKey(evt)) {
       this._hideFilmPopup();
     }
-  }
-
-  getFilm() {
-    return this._filmCardComponent.getFilmData();
   }
 }

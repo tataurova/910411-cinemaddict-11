@@ -58,3 +58,9 @@ export const FilmCardViewMode = {
   DEFAULT: `default`,
   POPUP: `popup`,
 };
+
+export const ButtonID = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`,
+};
