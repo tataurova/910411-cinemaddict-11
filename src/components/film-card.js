@@ -1,5 +1,6 @@
 import {MAX_LENGTH_SHOWING_TEXT} from "../const.js";
 import AbstractComponent from "./abstract-component.js";
+import moment from "moment";
 
 const createButtonMarkup = (name, text, isPressed) => {
   return (
@@ -23,7 +24,6 @@ const createFilmCardTemplate = (film) => {
     poster,
     title,
     rating,
-    durationHours,
     durationMinutes,
     genres,
     description,
@@ -34,7 +34,8 @@ const createFilmCardTemplate = (film) => {
     isFavorite,
   } = film;
 
-  const year = productionDate.getFullYear();
+  const year = moment(productionDate).format(`gggg`);
+  const durationHours = moment.utc(moment.duration(durationMinutes, "minutes").asMilliseconds()).format("H[h] mm[m]");
   const addToWatchListButton = createButtonMarkup(`add-to-watchlist`, `Add to watchlist`, isInWatchlist);
   const markAsWatchedButton = createButtonMarkup(`mark-as-watched`, `Mark as watched`, isWatched);
   const addToFavoriteButton = createButtonMarkup(`favorite`, `Mark as favorite`, isFavorite);
@@ -44,7 +45,7 @@ const createFilmCardTemplate = (film) => {
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${year}</span>
-        <span class="film-card__duration">${durationHours}h ${durationMinutes}m</span>
+        <span class="film-card__duration">${durationHours}</span>
         <span class="film-card__genre">${genres.join(` `)}</span>
       </p>
       <img src="${poster}" alt="" class="film-card__poster">

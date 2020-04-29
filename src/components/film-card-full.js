@@ -1,6 +1,7 @@
 import {COMMENT_EMOJIS} from "../const.js";
 import {MONTH_NAMES} from "../const.js";
 import AbstractSmartComponent from "./abstract-smart-component.js";
+import moment from "moment";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -22,7 +23,7 @@ const createEmojiImage = (name) => {
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) => {
     const {text, emotion, author, date} = comment;
-    const commentDate = new Intl.DateTimeFormat(`ja-JP`).format(date);
+    const commentDate = moment(date).format(`YYYY/MM/DD`);
     return (
       `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
@@ -63,7 +64,6 @@ const createFilmCardFullTemplate = (film, options) => {
     poster,
     title,
     rating,
-    durationHours,
     durationMinutes,
     genres,
     description,
@@ -81,8 +81,9 @@ const createFilmCardFullTemplate = (film, options) => {
 
   const {isEmoji, emojiName} = options;
 
-  const date = `${productionDate.getDay()} ${MONTH_NAMES[productionDate.getMonth()]}`;
-  const year = productionDate.getFullYear();
+  const date = moment(productionDate).format(`D MMMM`);
+  const year = moment(productionDate).format(`gggg`);
+  const durationHours = moment.utc(moment.duration(durationMinutes, "minutes").asMilliseconds()).format("H[h] mm[m]");
 
   return (
     `<section class="film-details">
@@ -116,7 +117,7 @@ const createFilmCardFullTemplate = (film, options) => {
       [`Writers`, writers],
       [`Actors`, actors],
       [`Release Date`, `${date} ${year}`],
-      [`Runtime`, `${durationHours}h ${durationMinutes}m`],
+      [`Runtime`, `${durationHours}`],
       [`Country`, country],
       [genres.length === 1 ? `Genre` : `Genres`, createGenresTemplate(genres)]
     ].map(([term, cell]) => (
@@ -183,10 +184,6 @@ export default class FilmCardFull extends AbstractSmartComponent {
     this._setControlButtonsChangeHandler = null;
     this._subscribeOnEvents();
 
-  }
-
-  rerenderComments() {
-    this._newComment.rerender();
   }
 
   getTemplate() {
