@@ -16,6 +16,16 @@ const renderFilms = (filmListElement, films, onDataChange, onViewChange) => {
   });
 };
 
+const renderFilmListContainer = (container, {title, isExtra}) => {
+  const filmListComponent = new FilmListComponent({title, isExtra});
+  const filmListContainerComponent = new FilmListContainerComponent();
+
+  render(container, filmListComponent);
+  render(filmListComponent.getElement(), filmListContainerComponent);
+
+  return filmListContainerComponent;
+};
+
 export default class FilmBlockController {
   constructor(container) {
     this._container = container;
@@ -27,22 +37,22 @@ export default class FilmBlockController {
     this._sortComponent = new SortComponent();
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
 
+    this._filmListContainerComponent = null;
+
+    this._showedTopFilmControllers = [];
+    this._showedCommentsFilmControllers = [];
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
 
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
-
-    this._filmListContainerComponent = null;
-
-    this._showedTopFilmControllers = [];
-    this._showedCommentsFilmControllers = [];
   }
 
   render(films) {
     const container = this._container;
 
-    render(container, this._sortComponent, RenderPosition.BEFOREBEGIN);
+    render(container, this._sortComponent);
 
     if (films.length === 0) {
       const filmListComponentNoFilms = new FilmListComponent({title: `There are no movies in our database`});
@@ -58,17 +68,7 @@ export default class FilmBlockController {
     this._ratingSortedFilms = ratingSortedFilms;
     this._commentsSortedFilms = commentsSortedFilms;
 
-    const renderFilmListContainer = ({title, isExtra}) => {
-      const filmListComponent = new FilmListComponent({title, isExtra});
-      const filmListContainerComponent = new FilmListContainerComponent();
-
-      render(container, filmListComponent);
-      render(filmListComponent.getElement(), filmListContainerComponent);
-
-      return filmListContainerComponent;
-    };
-
-    const filmListContainerComponent = renderFilmListContainer({title: `All movies. Upcoming`, isExtra: false,
+    const filmListContainerComponent = renderFilmListContainer(container, {title: `All movies. Upcoming`, isExtra: false,
       isNoHeader: true});
 
     this._renderFilms(filmListContainerComponent, this._films.slice(0, CardCount.ON_START));
@@ -76,13 +76,13 @@ export default class FilmBlockController {
     this._filmListContainerComponent = filmListContainerComponent;
 
     if (ratingSortedFilms[0].rating > 0) {
-      const filmTopListContainerComponent = renderFilmListContainer({title: `Top rated`, isExtra: true});
+      const filmTopListContainerComponent = renderFilmListContainer(container, {title: `Top rated`, isExtra: true});
 
       this._showedTopFilmControllers = this._renderFilms(filmTopListContainerComponent, ratingSortedFilms.slice(0, CardCount.TOP));
     }
 
     if (commentsSortedFilms[0].comments.length > 0) {
-      const filmCommentedListContainerComponent = renderFilmListContainer({title: `Most Commented`, isExtra: true});
+      const filmCommentedListContainerComponent = renderFilmListContainer(container, {title: `Most Commented`, isExtra: true});
 
       this._showedCommentsFilmControllers = this._renderFilms(filmCommentedListContainerComponent, commentsSortedFilms
         .slice(0, CardCount.COMMENTED));
@@ -139,9 +139,7 @@ export default class FilmBlockController {
 
     this._filmListContainerComponent.clear();
 
-    const newFilms = renderFilms(this._filmListContainerComponent.getElement(),
-        sortedFilms.slice(0, this._showingFilmCount), this._onDataChange, this._onViewChange);
-
+    const newFilms = this._renderFilms(this._filmListContainerComponent, sortedFilms.slice(0, this._showingFilmCount));
     this._showedFilmControllers = newFilms.concat(
         this._showedTopFilmControllers,
         this._showedCommentsFilmControllers

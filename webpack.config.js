@@ -15,8 +15,6 @@ module.exports = {
     watchContentBase: true
   },
   plugins: [
-    new MomentLocalesPlugin({
-      localesToKeep: [`es-us`],
-    })
+    new MomentLocalesPlugin()
   ]
 };
