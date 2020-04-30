@@ -43,6 +43,17 @@ export default class FilmController {
     }
   }
 
+
+  getFilm() {
+    return this._filmCardComponent.getFilmData();
+  }
+
+  setDefaultView() {
+    if (this._mode !== ViewMode.DEFAULT) {
+      this._hideFilmPopup();
+    }
+  }
+
   _setFilmCardComponentHandlers() {
     this._filmCardComponent.setClickHandler(() => {
       this._showFilmPopup();
@@ -91,16 +102,6 @@ export default class FilmController {
       }
     });
 
-  }
-
-  getFilm() {
-    return this._filmCardComponent.getFilmData();
-  }
-
-  setDefaultView() {
-    if (this._mode !== ViewMode.DEFAULT) {
-      this._hideFilmPopup();
-    }
   }
 
   _showFilmPopup() {
