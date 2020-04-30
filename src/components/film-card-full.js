@@ -1,6 +1,7 @@
+import AbstractSmartComponent from "./abstract-smart-component.js";
 import {COMMENT_EMOJIS} from "../const.js";
-import {MONTH_NAMES} from "../const.js";
-import AbstractComponent from "./abstract-component.js";
+import {formatDuration} from "../utils/common.js";
+import moment from "moment";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -10,10 +11,19 @@ const createGenresTemplate = (genres) => {
   }).join(`\n`);
 };
 
+const createEmojiImage = (name) => {
+  const image = document.createElement(`img`);
+  image.width = 55;
+  image.height = 55;
+  image.src = `images/emoji/${name}.png`;
+  image.alt = `emoji-${name}`;
+  return image;
+};
+
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) => {
     const {text, emotion, author, date} = comment;
-    const commentDate = new Intl.DateTimeFormat(`ja-JP`).format(date);
+    const commentDate = moment(date).format(`YYYY/MM/DD`);
     return (
       `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
@@ -49,12 +59,11 @@ const createEmojiItemTemplate = (names) => {
   }).join(`\n`);
 };
 
-const createFilmCardFullTemplate = (film) => {
+const createFilmCardFullTemplate = (film, options) => {
   const {
     poster,
     title,
     rating,
-    durationHours,
     durationMinutes,
     genres,
     description,
@@ -64,11 +73,16 @@ const createFilmCardFullTemplate = (film) => {
     actors,
     productionDate,
     country,
-    ageRating
+    ageRating,
+    isInWatchlist,
+    isWatched,
+    isFavorite,
   } = film;
 
-  const date = `${productionDate.getDay()} ${MONTH_NAMES[productionDate.getMonth()]}`;
-  const year = productionDate.getFullYear();
+  const {emojiName} = options;
+
+  const releaseDate = moment(productionDate).format(`D MMMM YYYY`);
+  const durationHours = formatDuration(durationMinutes);
 
   return (
     `<section class="film-details">
@@ -101,8 +115,8 @@ const createFilmCardFullTemplate = (film) => {
       [`Director`, director],
       [`Writers`, writers],
       [`Actors`, actors],
-      [`Release Date`, `${date} ${year}`],
-      [`Runtime`, `${durationHours}h ${durationMinutes}m`],
+      [`Release Date`, `${releaseDate}`],
+      [`Runtime`, durationHours],
       [`Country`, country],
       [genres.length === 1 ? `Genre` : `Genres`, createGenresTemplate(genres)]
     ].map(([term, cell]) => (
@@ -120,13 +134,13 @@ const createFilmCardFullTemplate = (film) => {
       </div>
 
       <section class="film-details__controls">
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
+        <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isInWatchlist ? `checked` : ``}>
         <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
+        <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${isWatched ? `checked` : ``}>
         <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-        <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
+        <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${isFavorite ? `checked` : ``}>
         <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
       </section>
     </div>
@@ -134,40 +148,79 @@ const createFilmCardFullTemplate = (film) => {
     <div class="form-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-
         <ul class="film-details__comments-list">
           ${createCommentsTemplate(comments)}
         </ul>
-
-        <div class="film-details__new-comment">
-          <div for="add-emoji" class="film-details__add-emoji-label"></div>
-
+         <div class="film-details__new-comment">
+          <div for="add-emoji" class="film-details__add-emoji-label">
+          ${emojiName ? `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="emoji-${emojiName}">` : ``}</div>
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${emojiName ? `Great movie!` : ``}</textarea>
           </label>
-
           <div class="film-details__emoji-list">
             ${createEmojiItemTemplate(COMMENT_EMOJIS)}
           </div>
         </div>
       </section>
     </div>
+
   </form>
 </section>`
   );
 };
 
-export default class FilmCardFull extends AbstractComponent {
+export default class FilmCardFull extends AbstractSmartComponent {
   constructor(film) {
     super();
     this._film = film;
+
+    this._emojiName = ``;
+
+    this._closeButtonHandler = null;
+    this._controlButtonsChangeHandler = null;
+    this._subscribeOnEvents();
+
   }
 
   getTemplate() {
-    return createFilmCardFullTemplate(this._film);
+    return createFilmCardFullTemplate(this._film, {emojiName: this._emojiName});
+  }
+
+  recoveryListeners() {
+    this.setCloseButtonHandler(this._closeButtonHandler);
+    this.setControlButtonsChangeHandler(this._controlButtonsChangeHandler);
+    this._subscribeOnEvents();
   }
 
   setCloseButtonHandler(handler) {
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
+    this._closeButtonHandler = handler;
+  }
+
+  setControlButtonsChangeHandler(handler) {
+    this.getElement().querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+      handler(evt.target.id);
+    });
+    this._controlButtonsChangeHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+    const imageBlockElement = element.querySelector(`.film-details__add-emoji-label`);
+    const text = element.querySelector(`.film-details__comment-input`);
+
+    const rerenderWithCommentEmoji = (name) => {
+      this._isEmoji = true;
+      this._emojiName = name;
+      const image = createEmojiImage(name);
+      imageBlockElement.innerHTML = ``;
+      imageBlockElement.appendChild(image);
+      text.textContent = `Great movie!`;
+    };
+
+    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
+      rerenderWithCommentEmoji(evt.target.value);
+    });
+
   }
 }

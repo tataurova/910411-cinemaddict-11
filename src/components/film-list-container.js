@@ -15,4 +15,9 @@ export default class FilmListContainer extends AbstractComponent {
   getTemplate() {
     return createFilmListContainerTemplate(this._info);
   }
+
+  clear() {
+    this.getElement().innerHTML = ``;
+  }
 }
+

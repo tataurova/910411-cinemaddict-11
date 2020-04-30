@@ -48,9 +48,19 @@ export const RenderPosition = {
   BEFOREEND: `beforeend`
 };
 
-
 export const SortType = {
   DATE_DOWN: `date-down`,
   RATING_DOWN: `rating-down`,
   DEFAULT: `default`,
+};
+
+export const FilmCardViewMode = {
+  DEFAULT: `default`,
+  POPUP: `popup`,
+};
+
+export const ButtonID = {
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favorite`,
 };

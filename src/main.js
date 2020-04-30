@@ -20,7 +20,7 @@ render(siteMainElement, new FilterComponent(watchStats));
 render(footerStatisticElement, new StatsComponent(films.length));
 
 const filmBlockComponent = new FilmBlockComponent();
-const filmBlockController = new FilmBlockController(filmBlockComponent);
+const filmBlockController = new FilmBlockController(filmBlockComponent.getElement());
 
 render(siteMainElement, filmBlockComponent);
 filmBlockController.render(films);
