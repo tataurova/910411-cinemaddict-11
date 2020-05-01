@@ -24,3 +24,5 @@ const filmBlockController = new FilmBlockController(filmBlockComponent.getElemen
 
 render(siteMainElement, filmBlockComponent);
 filmBlockController.render(films);
+
+console.log(films.forEach((el) => {console.log(el.id)}));
