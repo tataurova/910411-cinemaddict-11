@@ -7,17 +7,12 @@ const createFilmListContainerTemplate = () => {
 };
 
 export default class FilmListContainer extends AbstractComponent {
-  constructor(info) {
+  constructor() {
     super();
-    this._info = info;
   }
 
   getTemplate() {
-    return createFilmListContainerTemplate(this._info);
-  }
-
-  clear() {
-    this.getElement().innerHTML = ``;
+    return createFilmListContainerTemplate();
   }
 }
 

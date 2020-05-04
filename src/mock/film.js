@@ -117,6 +117,7 @@ const generateGenre = () => {
 
 const generateComment = () => {
   return {
+    id: Math.floor(Math.random() * Date.now()).toString(),
     text: getRandomArrayItem(COMMENTS),
     emotion: getRandomArrayItem(EMOTIONS),
     author: getRandomArrayItem(AUTHORS),

@@ -2,6 +2,7 @@ import AbstractSmartComponent from "./abstract-smart-component.js";
 import {COMMENT_EMOJIS} from "../const.js";
 import {formatDuration} from "../utils/common.js";
 import moment from "moment";
+import {encode} from "he";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -11,23 +12,14 @@ const createGenresTemplate = (genres) => {
   }).join(`\n`);
 };
 
-const createEmojiImage = (name) => {
-  const image = document.createElement(`img`);
-  image.width = 55;
-  image.height = 55;
-  image.src = `images/emoji/${name}.png`;
-  image.alt = `emoji-${name}`;
-  return image;
-};
-
 const createCommentsTemplate = (comments) => {
   return comments.map((comment) => {
-    const {text, emotion, author, date} = comment;
+    const {id, text, emotion, author, date} = comment;
     const commentDate = moment(date).format(`YYYY/MM/DD`);
     return (
-      `<li class="film-details__comment">
+      `<li data-id="${id}" class="film-details__comment">
             <span class="film-details__comment-emoji">
-              <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-{emotion}">
+              <img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
             </span>
             <div>
               <p class="film-details__comment-text">${text}</p>
@@ -135,7 +127,7 @@ const createFilmCardFullTemplate = (film, options) => {
 
       <section class="film-details__controls">
         <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${isInWatchlist ? `checked` : ``}>
-        <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
+        <label for="watchlist" class="film-details__control-label film-details__control-label--watched">Add to watchlist</label>
 
         <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${isWatched ? `checked` : ``}>
         <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
@@ -173,12 +165,15 @@ export default class FilmCardFull extends AbstractSmartComponent {
   constructor(film) {
     super();
     this._film = film;
+    this._element = this.getElement();
 
     this._emojiName = ``;
 
     this._closeButtonHandler = null;
     this._controlButtonsChangeHandler = null;
-    this._subscribeOnEvents();
+    this._deleteCommentButtonClickHandler = null;
+    this._setAddNewCommentHandler = null;
+    this._setNewCommentEmoji();
 
   }
 
@@ -189,37 +184,65 @@ export default class FilmCardFull extends AbstractSmartComponent {
   recoveryListeners() {
     this.setCloseButtonHandler(this._closeButtonHandler);
     this.setControlButtonsChangeHandler(this._controlButtonsChangeHandler);
-    this._subscribeOnEvents();
+    this.setDeleteCommentButtonClickHandler(this._deleteCommentButtonClickHandler);
+    this.setAddNewCommentHandler(this._addNewCommentHandler);
+    this._setNewCommentEmoji();
+  }
+
+  getNewComment() {
+    const textCommentElement = this._element.querySelector(`.film-details__comment-input`);
+
+    const text = encode(textCommentElement.value);
+    const emotion = this._emojiName;
+    const author = `Tester`;
+
+    if (!emotion || !text) {
+      return null;
+    }
+
+    const id = Math.floor(Math.random() * Date.now());
+    const date = new Date();
+
+    return {
+      id,
+      text,
+      emotion,
+      author,
+      date,
+    };
   }
 
   setCloseButtonHandler(handler) {
-    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
+    this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
     this._closeButtonHandler = handler;
   }
 
   setControlButtonsChangeHandler(handler) {
-    this.getElement().querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
+    this._element.querySelector(`.film-details__controls`).addEventListener(`change`, (evt) => {
       handler(evt.target.id);
     });
     this._controlButtonsChangeHandler = handler;
   }
 
-  _subscribeOnEvents() {
-    const element = this.getElement();
-    const imageBlockElement = element.querySelector(`.film-details__add-emoji-label`);
-    const text = element.querySelector(`.film-details__comment-input`);
+  setDeleteCommentButtonClickHandler(handler) {
+    const deleteCommentsButtons = this._element.querySelectorAll(`.film-details__comment-delete`);
+    if (deleteCommentsButtons) {
+      Array.from(deleteCommentsButtons).forEach((button) => button.addEventListener(`click`, handler));
+    }
+    this._deleteCommentButtonClickHandler = handler;
+  }
 
-    const rerenderWithCommentEmoji = (name) => {
-      this._isEmoji = true;
-      this._emojiName = name;
-      const image = createEmojiImage(name);
-      imageBlockElement.innerHTML = ``;
-      imageBlockElement.appendChild(image);
-      text.textContent = `Great movie!`;
-    };
+  setAddNewCommentHandler(handler) {
+    const textCommentElement = this._element.querySelector(`.film-details__comment-input`);
+    textCommentElement.addEventListener(`keydown`, handler);
 
-    element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
-      rerenderWithCommentEmoji(evt.target.value);
+    this._addNewCommentHandler = handler;
+  }
+
+  _setNewCommentEmoji() {
+    this._element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, (evt) => {
+      this._emojiName = evt.target.value;
+      this.rerender();
     });
 
   }
