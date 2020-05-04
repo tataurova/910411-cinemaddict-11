@@ -117,6 +117,7 @@ const generateGenre = () => {
 
 const generateComment = () => {
   return {
+    id: Math.floor(Math.random() * Date.now()).toString(),
     text: getRandomArrayItem(COMMENTS),
     emotion: getRandomArrayItem(EMOTIONS),
     author: getRandomArrayItem(AUTHORS),
@@ -134,6 +135,7 @@ const generateFilm = () => {
   const countComments = getRandomIntegerNumber(0, 5);
 
   return {
+    id: Math.floor(Math.random() * Date.now()),
     poster: getRandomArrayItem(FILM_POSTERS),
     title: getRandomArrayItem(FILM_TITLES),
     rating: getRandomIntegerNumber(0, 100) / 10,

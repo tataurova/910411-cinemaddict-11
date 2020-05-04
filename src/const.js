@@ -40,6 +40,8 @@ export const COMMENT_EMOJIS = [
 export const KeyboardKey = {
   ESCAPE: `Escape`,
   ESC: `Esc`,
+  ENTER: `Enter`,
+  COMMAND: `metaKey`,
 };
 
 export const RenderPosition = {
@@ -64,3 +66,12 @@ export const ButtonID = {
   WATCHED: `watched`,
   FAVORITE: `favorite`,
 };
+
+export const FilterType = {
+  ALL: `all`,
+  WATCHLIST: `watchlist`,
+  HISTORY: `history`,
+  FAVORITES: `favorites`,
+};
+
+export const SHOWING_FILTERED_FILMS_COUNT = 5;

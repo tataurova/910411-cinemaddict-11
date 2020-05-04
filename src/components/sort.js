@@ -1,5 +1,6 @@
-import AbstractComponent from "./abstract-component.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
 import {SortType} from "../const.js";
+import {activateElement} from "../utils/interactivity";
 
 const createSortTemplate = () => {
   return (
@@ -11,11 +12,12 @@ const createSortTemplate = () => {
   );
 };
 
-export default class Sort extends AbstractComponent {
+export default class Sort extends AbstractSmartComponent {
   constructor() {
     super();
 
     this._currentSortType = SortType.DEFAULT;
+    this._sortTypeChangeHandler = null;
   }
 
   getTemplate() {
@@ -24,6 +26,19 @@ export default class Sort extends AbstractComponent {
 
   getSortType() {
     return this._currentSortType;
+  }
+
+  recoveryListeners() {
+    this.setSortTypeChangeHandler(this._sortTypeChangeHandler);
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  reset() {
+    this._currentSortType = SortType.DEFAULT;
+    this.rerender();
   }
 
   setSortTypeChangeHandler(handler) {
@@ -40,12 +55,13 @@ export default class Sort extends AbstractComponent {
         return;
       }
 
-      this._currentSortType = sortType;
+      activateElement(evt.target, this.getElement(), `sort__button--active`);
 
-      this.getElement().querySelector(`.sort__button--active`).classList.toggle(`sort__button--active`);
-      evt.target.classList.toggle(`sort__button--active`);
+      this._currentSortType = sortType;
 
       handler(this._currentSortType);
     });
+    this._sortTypeChangeHandler = handler;
   }
 }
+

@@ -2,15 +2,16 @@ import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
 import {render, remove, replace} from "../utils/render.js";
 import {FilmCardViewMode as ViewMode, ButtonID} from "../const.js";
-import {isEscKey} from "../utils/keyboard.js";
+import {isEscKey, isCtrlAndEnter} from "../utils/keyboard.js";
 
 export default class FilmController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, updateCommentedFilms) {
     this._container = container;
     this._film = null;
 
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._updateCommentedFilms = updateCommentedFilms;
     this._mode = ViewMode.DEFAULT;
 
     this._filmCardComponent = null;
@@ -36,13 +37,14 @@ export default class FilmController {
     this._setFilmCardFullComponentHandlers();
 
     if (oldFilmCardComponent && oldFilmCardFullComponent) {
+
       replace(this._filmCardComponent, oldFilmCardComponent);
       replace(this._filmCardFullComponent, oldFilmCardFullComponent);
     } else {
       render(this._container, this._filmCardComponent);
     }
-  }
 
+  }
 
   getFilm() {
     return this._filmCardComponent.getFilmData();
@@ -52,6 +54,12 @@ export default class FilmController {
     if (this._mode !== ViewMode.DEFAULT) {
       this._hideFilmPopup();
     }
+  }
+
+  destroy() {
+    remove(this._filmCardFullComponent);
+    remove(this._filmCardComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _setFilmCardComponentHandlers() {
@@ -102,6 +110,27 @@ export default class FilmController {
       }
     });
 
+    this._filmCardFullComponent.setDeleteCommentButtonClickHandler((evt) => {
+      evt.preventDefault();
+
+      const deleteButtonElement = evt.target;
+      const commentItem = deleteButtonElement.closest(`.film-details__comment`);
+      const removeCommentId = commentItem.dataset.id;
+      const comments = this._film.comments.filter((comment) => comment.id !== removeCommentId);
+
+      this._onDataChange(this, this._film, Object.assign(this._film, {comments}));
+    });
+
+    this._filmCardFullComponent.setAddNewCommentHandler((evt) => {
+      if (isCtrlAndEnter(evt)) {
+        const comment = this._filmCardFullComponent.getNewComment();
+        if (comment) {
+          const newComments = this._film.comments.concat(comment);
+          this._onDataChange(this, this._film, Object.assign(this._film, {comments: newComments}));
+        }
+      }
+    });
+
   }
 
   _showFilmPopup() {
@@ -117,7 +146,7 @@ export default class FilmController {
   _hideFilmPopup() {
     this._mode = ViewMode.DEFAULT;
     remove(this._filmCardFullComponent);
-
+    this._updateCommentedFilms();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
