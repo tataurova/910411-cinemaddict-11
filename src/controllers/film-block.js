@@ -148,11 +148,8 @@ export default class FilmBlockController {
   }
 
   _renderShowMoreButton() {
-    const filmListContainerElement = this._filmListContainerComponent.getElement();
     render(this._filmListComponent.getElement(), this._showMoreButtonComponent, RenderPosition.BEFOREEND);
-
     this._showMoreButtonComponent.setClickHandler(this._onShowMoreButtonClick);
-
   }
 
   _onShowMoreButtonClick() {
