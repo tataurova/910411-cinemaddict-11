@@ -74,4 +74,16 @@ export const FilterType = {
   FAVORITES: `favorites`,
 };
 
+export const MENU_ITEM_STATS = `stats`;
+
 export const SHOWING_FILTERED_FILMS_COUNT = 5;
+
+export const HIDDEN_CLASS = `visually-hidden`;
+
+export const StatisticFilterType = {
+  ALL: `all-time`,
+  TODAY: `today`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`
+};

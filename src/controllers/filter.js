@@ -1,5 +1,5 @@
 import FilterComponent from "../components/filter.js";
-import {FilterType} from "../const.js";
+import {FilterType, RenderPosition} from "../const.js";
 import {render, replace} from "../utils/render.js";
 import {getFilmsByFilter} from "../utils/filter.js";
 
@@ -33,11 +33,10 @@ export default class FilterController {
     this._filterComponent = new FilterComponent(filters);
     this._filterComponent.setFilterChangeHandler(this._onFilterChange);
 
-
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
     } else {
-      render(container, this._filterComponent);
+      render(container, this._filterComponent, RenderPosition.AFTERBEGIN);
     }
   }
 
