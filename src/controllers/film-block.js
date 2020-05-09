@@ -60,6 +60,14 @@ export default class FilmBlockController {
     this._filmsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
+  hide() {
+    this._container.hide();
+  }
+
+  show() {
+    this._container.show();
+  }
+
   render() {
     const container = this._container;
     const films = this._filmsModel.getFilms();
@@ -140,12 +148,8 @@ export default class FilmBlockController {
   }
 
   _renderShowMoreButton() {
-    const filmListContainerElement = this._filmListContainerComponent.getElement();
-
-    render(filmListContainerElement, this._showMoreButtonComponent, RenderPosition.AFTERBEGIN);
-
+    render(this._filmListComponent.getElement(), this._showMoreButtonComponent, RenderPosition.BEFOREEND);
     this._showMoreButtonComponent.setClickHandler(this._onShowMoreButtonClick);
-
   }
 
   _onShowMoreButtonClick() {

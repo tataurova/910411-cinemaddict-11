@@ -10,7 +10,7 @@ export const getRandomIntegerNumber = (min, max) => {
 
 export const generateRandomDate = () => {
   const currentDate = new Date();
-  currentDate.setMonth(currentDate.getMonth() - getRandomIntegerNumber(0, 1500));
+  currentDate.setMonth(currentDate.getMonth() - getRandomIntegerNumber(0, 12));
   currentDate.setMinutes(currentDate.getMinutes() - getRandomIntegerNumber(0, 1500));
   return currentDate;
 };
