@@ -1,5 +1,5 @@
-import {RATING_TITLES} from "../const.js";
 import AbstractComponent from "./abstract-component.js";
+import {RATING_TITLES} from "../const.js";
 
 const getProfileRating = (value) => RATING_TITLES
    .find(({rating}) => rating <= value)

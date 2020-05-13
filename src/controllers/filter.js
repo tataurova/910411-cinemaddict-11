@@ -1,7 +1,7 @@
+import {getFilmsByFilter} from "../utils/filter.js";
 import FilterComponent from "../components/filter.js";
 import {FilterType, RenderPosition} from "../const.js";
 import {render, replace} from "../utils/render.js";
-import {getFilmsByFilter} from "../utils/filter.js";
 
 export default class FilterController {
   constructor(container, filmsModel) {

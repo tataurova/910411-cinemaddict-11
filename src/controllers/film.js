@@ -1,8 +1,9 @@
+import {isEscKey, isCtrlAndEnter} from "../utils/keyboard.js";
 import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
-import {render, remove, replace} from "../utils/render.js";
+import FilmModel from "../models/film.js";
 import {FilmCardViewMode as ViewMode, ButtonID} from "../const.js";
-import {isEscKey, isCtrlAndEnter} from "../utils/keyboard.js";
+import {render, remove, replace} from "../utils/render.js";
 
 export default class FilmController {
   constructor(container, onDataChange, onViewChange, updateCommentedFilms) {
@@ -67,22 +68,25 @@ export default class FilmController {
       this._showFilmPopup();
     });
 
-    this._filmCardComponent.setAddToWatchlistButtonClickHandler(() => {
-      this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        isInWatchlist: !this._film.isInWatchlist,
-      }));
+    this._filmCardComponent.setAddToWatchlistButtonClickHandler((evt) => {
+      evt.preventDefault();
+      const newFilm = FilmModel.clone(this._film);
+      newFilm.isInWatchlist = !newFilm.isInWatchlist;
+      this._onDataChange(this, this._film, newFilm);
     });
 
-    this._filmCardComponent.setMarkAsWatchedButtonClickHandler(() => {
-      this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        isWatched: !this._film.isWatched,
-      }));
+    this._filmCardComponent.setMarkAsWatchedButtonClickHandler((evt) => {
+      evt.preventDefault();
+      const newFilm = FilmModel.clone(this._film);
+      newFilm.isWatched = !this._film.isWatched;
+      this._onDataChange(this, this._film, newFilm);
     });
 
-    this._filmCardComponent.setFavoriteButtonClickHandler(() => {
-      this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        isFavorite: !this._film.isFavorite,
-      }));
+    this._filmCardComponent.setFavoriteButtonClickHandler((evt) => {
+      evt.preventDefault();
+      const newFilm = FilmModel.clone(this._film);
+      newFilm.isFavorite = !this._film.isFavorite;
+      this._onDataChange(this, this._film, newFilm);
     });
   }
 
@@ -94,19 +98,19 @@ export default class FilmController {
 
     this._filmCardFullComponent.setControlButtonsChangeHandler((buttonID) => {
       if (buttonID === ButtonID.WATCHLIST) {
-        this._onDataChange(this, this._film, (Object.assign({}, this._film, {
-          isInWatchlist: !this._film.isInWatchlist,
-        })));
+        const newFilm = FilmModel.clone(this._film);
+        newFilm.isInWatchlist = !newFilm.isInWatchlist;
+        this._onDataChange(this, this._film, newFilm);
       }
       if (buttonID === ButtonID.WATCHED) {
-        this._onDataChange(this, this._film, (Object.assign({}, this._film, {
-          isWatched: !this._film.isWatched,
-        })));
+        const newFilm = FilmModel.clone(this._film);
+        newFilm.isWatched = !this._film.isWatched;
+        this._onDataChange(this, this._film, newFilm);
       }
       if (buttonID === ButtonID.FAVORITE) {
-        this._onDataChange(this, this._film, (Object.assign({}, this._film, {
-          isFavorite: !this._film.isFavorite,
-        })));
+        const newFilm = FilmModel.clone(this._film);
+        newFilm.isFavorite = !this._film.isFavorite;
+        this._onDataChange(this, this._film, newFilm);
       }
     });
 

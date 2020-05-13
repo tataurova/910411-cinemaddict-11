@@ -1,8 +1,9 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {COMMENT_EMOJIS} from "../const.js";
+import {encode} from "he";
 import {formatDuration} from "../utils/common.js";
 import moment from "moment";
-import {encode} from "he";
+
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -52,20 +53,22 @@ const createEmojiItemTemplate = (names) => {
 };
 
 const createFilmCardFullTemplate = (film, options) => {
+
   const {
     poster,
     title,
+    alternativeTitle,
     rating,
     durationMinutes,
     genres,
     description,
-    comments,
     director,
     writers,
     actors,
     productionDate,
     country,
     ageRating,
+    comments,
     isInWatchlist,
     isWatched,
     isFavorite,
@@ -94,7 +97,7 @@ const createFilmCardFullTemplate = (film, options) => {
           <div class="film-details__info-head">
             <div class="film-details__title-wrap">
               <h3 class="film-details__title">${title}</h3>
-              <p class="film-details__title-original">Original: ${title}</p>
+              <p class="film-details__title-original">Original: ${alternativeTitle}</p>
             </div>
 
             <div class="film-details__rating">
@@ -105,8 +108,8 @@ const createFilmCardFullTemplate = (film, options) => {
           <table class="film-details__table">
             ${[
       [`Director`, director],
-      [`Writers`, writers],
-      [`Actors`, actors],
+      [`Writers`, writers.join(`, `)],
+      [`Actors`, actors.join(`, `)],
       [`Release Date`, `${releaseDate}`],
       [`Runtime`, durationHours],
       [`Country`, country],
@@ -166,7 +169,6 @@ export default class FilmCardFull extends AbstractSmartComponent {
     super();
     this._film = film;
     this._element = this.getElement();
-
     this._emojiName = ``;
 
     this._closeButtonHandler = null;

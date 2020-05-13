@@ -23,6 +23,12 @@ export default class Films {
     this._callHandlers(this._dataChangeHandlers);
   }
 
+  setComments(comments) {
+    for (let i = 0; i < this._films.length; i++) {
+      this._films[i].comments = comments[i];
+    }
+  }
+
   setFilter(filterType) {
     this._activeFilterType = filterType;
     this._callHandlers(this._filterChangeHandlers);

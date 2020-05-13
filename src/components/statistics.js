@@ -2,9 +2,8 @@ import AbstractSmartComponent from "./abstract-smart-component.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getHoursDuration, getMinutesDuration} from "../utils/common.js";
-import {StatisticFilterType, RATING_TITLES} from "../const.js";
 import moment from "moment";
-
+import {StatisticFilterType, RATING_TITLES, FilterPeriod} from "../const.js";
 
 const getProfileRating = (value) => RATING_TITLES
    .find(({rating}) => rating <= value)
@@ -12,14 +11,6 @@ const getProfileRating = (value) => RATING_TITLES
 
 const BAR_HEIGHT = 50;
 const FILTER_ID_PREFIX = `statistic-`;
-
-
-const FILTER_MOMENT_UNIT_OF_TIME = {
-  'today': `days`,
-  'week': `weeks`,
-  'month': `months`,
-  'year': `years`
-};
 
 const getFilterNameById = (id) => {
   return id.substring(FILTER_ID_PREFIX.length);
@@ -153,8 +144,8 @@ export default class Statistic extends AbstractSmartComponent {
     return this._films.filter((film) => {
       const watchingDate = moment(film.watchingDate);
       const currentDate = moment(new Date());
-      const unitOfTime = FILTER_MOMENT_UNIT_OF_TIME[filter];
-      const dateDifference = currentDate.diff(watchingDate, unitOfTime);
+      const filterPeriod = FilterPeriod[filter];
+      const dateDifference = currentDate.diff(watchingDate, filterPeriod);
       return dateDifference < 1;
     });
   }

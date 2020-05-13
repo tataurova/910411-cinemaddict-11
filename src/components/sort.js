@@ -1,6 +1,7 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {SortType} from "../const.js";
 import {activateElement} from "../utils/interactivity";
+import {SortType} from "../const.js";
+
 
 const createSortTemplate = () => {
   return (
