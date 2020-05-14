@@ -4,7 +4,6 @@ import {encode} from "he";
 import {formatDuration} from "../utils/common.js";
 import moment from "moment";
 
-
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
     return (
@@ -52,7 +51,7 @@ const createEmojiItemTemplate = (names) => {
   }).join(`\n`);
 };
 
-const createFilmCardFullTemplate = (film, options) => {
+const createFilmCardFullTemplate = (film, comments, options) => {
 
   const {
     poster,
@@ -68,7 +67,6 @@ const createFilmCardFullTemplate = (film, options) => {
     productionDate,
     country,
     ageRating,
-    comments,
     isInWatchlist,
     isWatched,
     isFavorite,
@@ -165,9 +163,11 @@ const createFilmCardFullTemplate = (film, options) => {
 };
 
 export default class FilmCardFull extends AbstractSmartComponent {
-  constructor(film) {
+  constructor(film, commentsModel) {
     super();
     this._film = film;
+    this._commentsModel = commentsModel;
+    this._comments = this._commentsModel.getCommentsById(this._film.id);
     this._element = this.getElement();
     this._emojiName = ``;
 
@@ -180,7 +180,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createFilmCardFullTemplate(this._film, {emojiName: this._emojiName});
+    return createFilmCardFullTemplate(this._film, this._comments, {emojiName: this._emojiName});
   }
 
   recoveryListeners() {

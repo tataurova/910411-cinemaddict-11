@@ -6,8 +6,9 @@ import {FilmCardViewMode as ViewMode, ButtonID} from "../const.js";
 import {render, remove, replace} from "../utils/render.js";
 
 export default class FilmController {
-  constructor(container, onDataChange, onViewChange, updateCommentedFilms) {
+  constructor(container, onDataChange, onViewChange, updateCommentedFilms, commentsModel) {
     this._container = container;
+    this._commentsModel = commentsModel;
     this._film = null;
 
     this._onDataChange = onDataChange;
@@ -32,7 +33,7 @@ export default class FilmController {
     const oldFilmCardFullComponent = this._filmCardFullComponent;
 
     this._filmCardComponent = new FilmCardComponent(film);
-    this._filmCardFullComponent = new FilmCardFullComponent(film);
+    this._filmCardFullComponent = new FilmCardFullComponent(film, this._commentsModel);
 
     this._setFilmCardComponentHandlers();
     this._setFilmCardFullComponentHandlers();

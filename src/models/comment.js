@@ -7,6 +7,16 @@ export default class Comment {
     this.date = data.date;
   }
 
+  toRAW() {
+    return {
+      "id": this.id,
+      "comment": this.text,
+      "author": this.author,
+      "date": this.date,
+      "emotion": this.emotion,
+    };
+  }
+
   static parseComment(data) {
     return new Comment(data);
   }
