@@ -1,52 +1,75 @@
-import ProfileComponent from "./components/profile.js";
-import FilterController from "./controllers/filter.js";
-import SiteMenuComponent from "./components/site-menu.js";
-import StatsComponent from "./components/stats.js";
+import API from "./api.js";
+import {CardCount, MENU_ITEM_STATS} from "./const.js";
+import CommentsModel from "./models/comments.js";
 import FilmBlockComponent from "./components/film-block.js";
 import FilmBlockController from "./controllers/film-block.js";
-import StatisticsComponent from "./components/statistics.js";
-import {getWatchStats} from "./utils/stats.js";
-import {render} from "./utils/render.js";
-import {CardCount, MENU_ITEM_STATS} from "./const.js";
 import FilmsModel from "./models/films.js";
-import {generateFilms} from "./mock/film.js";
+import FilterController from "./controllers/filter.js";
+import {getWatchStats} from "./utils/stats.js";
+import ProfileComponent from "./components/profile.js";
+import {render, remove} from "./utils/render.js";
+import SiteMenuComponent from "./components/site-menu.js";
+import StatsComponent from "./components/stats.js";
+import StatisticsComponent from "./components/statistics.js";
 
+const AUTHORIZATION = `Basic DSffsgGFDGDFgsdf&s`;
+
+const api = new API(AUTHORIZATION);
+const filmsModel = new FilmsModel();
+const commentsModel = new CommentsModel();
+
+const footerStatisticElement = document.querySelector(`.footer__statistics`);
 const headerElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
-const footerStatisticElement = document.querySelector(`.footer__statistics`);
-
-const films = generateFilms(CardCount.MAIN);
-
-const filmsModel = new FilmsModel();
-filmsModel.setFilms(films);
-const watchStats = getWatchStats(films);
-
-render(headerElement, new ProfileComponent(watchStats));
 
 const siteMenuComponent = new SiteMenuComponent();
-render(siteMainElement, siteMenuComponent);
-
+const filmBlockComponent = new FilmBlockComponent();
+const filmBlockController = new FilmBlockController(filmBlockComponent.getElement(), filmsModel, commentsModel, api);
 const filterController = new FilterController(siteMenuComponent.getElement(), filmsModel);
+let statisticsComponent = new StatisticsComponent(filmsModel);
+
+render(siteMainElement, siteMenuComponent);
 filterController.render();
 
-render(footerStatisticElement, new StatsComponent(films.length));
-
-const statisticsComponent = new StatisticsComponent(filmsModel);
 render(siteMainElement, statisticsComponent);
 statisticsComponent.hide();
-
-const filmBlockComponent = new FilmBlockComponent();
-
-const filmBlockController = new FilmBlockController(filmBlockComponent.getElement(), filmsModel);
 render(siteMainElement, filmBlockComponent);
-filmBlockController.render(films);
+
+filmBlockController.renderLoadingMessage();
 
 siteMenuComponent.changeMenuItem((menuItem) => {
   if (menuItem === MENU_ITEM_STATS) {
       filmBlockComponent.hide();
-      statisticsComponent.show();
+      if (statisticsComponent) {
+        remove(statisticsComponent);
+        statisticsComponent = new StatisticsComponent(filmsModel);
+        render(siteMainElement, statisticsComponent);
+      }
   } else {
     statisticsComponent.hide();
     filmBlockComponent.show();
   }
 });
+
+api.getFilms()
+  .then((films) => {
+    filmsModel.setFilms(films);
+     return Promise.all(films.map((film) => api.getComments(film.id)));
+  })
+  .then((comments) => {
+   const films = filmsModel.getFilms();
+   for (let i = 0; i < films.length; i++) {
+     commentsModel.setComments(films[i].id, comments[i]);
+   }
+  })
+  .catch(() => {
+    filmsModel.setFilms([]);
+  })
+  .finally(() => {
+    filmBlockController.removeLoadingMessage();
+    const watchStats = getWatchStats(filmsModel.getFilms());
+    render(footerStatisticElement, new StatsComponent(filmsModel.getFilms().length));
+    render(headerElement, new ProfileComponent(watchStats));
+    filmBlockController.render(filmsModel.getFilms());
+  })
+

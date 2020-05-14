@@ -1,15 +1,15 @@
+import {CardCount, SortType, RenderPosition} from "../const.js";
+import {getSortedFilms} from "../utils/sort.js";
+import FilmController from "./film.js";
 import FilmListComponent from "../components/film-list.js";
 import FilmListContainerComponent from "../components/film-list-container.js";
+import {render, remove} from "../utils/render.js";
 import SortComponent from "../components/sort.js";
 import ShowMoreButtonComponent from "../components/show-more-button.js";
-import FilmController from "./film.js";
-import {CardCount, SortType, RenderPosition} from "../const.js";
-import {render, remove} from "../utils/render.js";
-import {getSortedFilms} from "../utils/sort.js";
 
-const renderFilms = (container, films, onDataChange, onViewChange, updateCommentedFilms) => {
+const renderFilms = (container, films, onDataChange, onViewChange, updateCommentedFilms, commentsModel) => {
   return films.map((film) => {
-    const filmController = new FilmController(container, onDataChange, onViewChange, updateCommentedFilms);
+    const filmController = new FilmController(container, onDataChange, onViewChange, updateCommentedFilms, commentsModel);
     filmController.render(film);
 
     return filmController;
@@ -27,9 +27,11 @@ const renderFilmListContainer = (container, {title, isExtra, isNoHeader}) => {
 };
 
 export default class FilmBlockController {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, commentsModel, api) {
     this._container = container;
     this._filmsModel = filmsModel;
+    this._commentsModel = commentsModel;
+    this._api = api;
 
     this._showedFilmControllers = [];
     this._showingFilmCount = CardCount.ON_START;
@@ -37,6 +39,7 @@ export default class FilmBlockController {
     this._sortComponent = new SortComponent();
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
 
+    this._loadingFilmList = new FilmListComponent({title: `Loading...`});
     this._filmListComponent = null;
     this._filmListContainerComponent = null;
     this._filmTopListComponent = null;
@@ -66,6 +69,14 @@ export default class FilmBlockController {
 
   show() {
     this._container.show();
+  }
+
+  renderLoadingMessage() {
+    render(this._container, this._loadingFilmList);
+  }
+
+  removeLoadingMessage() {
+    remove(this._loadingFilmList);
   }
 
   render() {
@@ -112,7 +123,8 @@ export default class FilmBlockController {
 
   _renderFilms(films) {
 
-    const newFilms = renderFilms(this._filmListContainerComponent.getElement(), films, this._onDataChange, this._onViewChange, this._updateCommentedFilms);
+    const newFilms = renderFilms(this._filmListContainerComponent.getElement(), films, this._onDataChange,
+        this._onViewChange, this._updateCommentedFilms, this._commentsModel);
     this._showedFilmControllers = this._showedFilmControllers.concat(newFilms);
 
   }
@@ -128,7 +140,8 @@ export default class FilmBlockController {
   _renderExtraFilms(header, films) {
 
     const [filmExtraListComponent, filmExtraListContainerComponent] = renderFilmListContainer(this._container, {title: header, isExtra: true});
-    const newFilms = renderFilms(filmExtraListContainerComponent.getElement(), films, this._onDataChange, this._onViewChange, this._updateCommentedFilms);
+    const newFilms = renderFilms(filmExtraListContainerComponent.getElement(), films, this._onDataChange,
+        this._onViewChange, this._updateCommentedFilms, this._commentsModel);
     return [newFilms, filmExtraListComponent, filmExtraListContainerComponent];
 
   }
@@ -168,14 +181,17 @@ export default class FilmBlockController {
 
   _onDataChange(filmController, oldData, newData) {
 
-    const isSuccess = this._filmsModel.updateFilm(oldData.id, newData);
-    if (isSuccess) {
+    this._api.updateFilm(oldData.id, newData)
+      .then((filmModel) => {
+        const isSuccess = this._filmsModel.updateFilm(oldData.id, filmModel);
 
-      const allShowedControllers = this._showedFilmControllers.concat(this._showedTopFilmControllers, this._showedCommentsFilmControllers);
-      const showedFilmControllers = allShowedControllers.filter((controller) => controller.getFilm() === oldData);
-      showedFilmControllers.forEach((controller) => controller.render(newData));
+        if (isSuccess) {
+          const allShowedControllers = this._showedFilmControllers.concat(this._showedTopFilmControllers, this._showedCommentsFilmControllers);
+          const showedFilmControllers = allShowedControllers.filter((controller) => controller.getFilm() === oldData);
+          showedFilmControllers.forEach((controller) => controller.render(newData));
+        }
+      });
 
-    }
   }
 
   _onViewChange() {

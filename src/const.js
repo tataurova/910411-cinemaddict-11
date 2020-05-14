@@ -74,6 +74,13 @@ export const FilterType = {
   FAVORITES: `favorites`,
 };
 
+export const FilterPeriod = {
+  'today': `days`,
+  'week': `weeks`,
+  'month': `months`,
+  'year': `years`
+};
+
 export const MENU_ITEM_STATS = `stats`;
 
 export const SHOWING_FILTERED_FILMS_COUNT = 5;

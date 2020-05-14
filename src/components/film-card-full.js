@@ -1,8 +1,8 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {COMMENT_EMOJIS} from "../const.js";
+import {encode} from "he";
 import {formatDuration} from "../utils/common.js";
 import moment from "moment";
-import {encode} from "he";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -51,15 +51,16 @@ const createEmojiItemTemplate = (names) => {
   }).join(`\n`);
 };
 
-const createFilmCardFullTemplate = (film, options) => {
+const createFilmCardFullTemplate = (film, comments, options) => {
+
   const {
     poster,
     title,
+    alternativeTitle,
     rating,
     durationMinutes,
     genres,
     description,
-    comments,
     director,
     writers,
     actors,
@@ -94,7 +95,7 @@ const createFilmCardFullTemplate = (film, options) => {
           <div class="film-details__info-head">
             <div class="film-details__title-wrap">
               <h3 class="film-details__title">${title}</h3>
-              <p class="film-details__title-original">Original: ${title}</p>
+              <p class="film-details__title-original">Original: ${alternativeTitle}</p>
             </div>
 
             <div class="film-details__rating">
@@ -105,8 +106,8 @@ const createFilmCardFullTemplate = (film, options) => {
           <table class="film-details__table">
             ${[
       [`Director`, director],
-      [`Writers`, writers],
-      [`Actors`, actors],
+      [`Writers`, writers.join(`, `)],
+      [`Actors`, actors.join(`, `)],
       [`Release Date`, `${releaseDate}`],
       [`Runtime`, durationHours],
       [`Country`, country],
@@ -162,11 +163,12 @@ const createFilmCardFullTemplate = (film, options) => {
 };
 
 export default class FilmCardFull extends AbstractSmartComponent {
-  constructor(film) {
+  constructor(film, commentsModel) {
     super();
     this._film = film;
+    this._commentsModel = commentsModel;
+    this._comments = this._commentsModel.getCommentsById(this._film.id);
     this._element = this.getElement();
-
     this._emojiName = ``;
 
     this._closeButtonHandler = null;
@@ -178,7 +180,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createFilmCardFullTemplate(this._film, {emojiName: this._emojiName});
+    return createFilmCardFullTemplate(this._film, this._comments, {emojiName: this._emojiName});
   }
 
   recoveryListeners() {
