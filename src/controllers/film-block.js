@@ -7,14 +7,11 @@ import {render, remove} from "../utils/render.js";
 import SortComponent from "../components/sort.js";
 import ShowMoreButtonComponent from "../components/show-more-button.js";
 
-const renderFilms = (container, films, onDataChange, onViewChange, onCommentChange, updateCommentedFilms, commentsModel, api) => {
+const renderFilms = (container, films, comments, onDataChange, onViewChange, onCommentChange, updateCommentedFilms, api) => {
   return films.map((film) => {
-    const comments = commentsModel.getCommentsById(film.id);
-
     const filmController = new FilmController(container, onDataChange, onViewChange, onCommentChange,
-      updateCommentedFilms, api);
-    console.log(comments);
-    filmController.render(film, comments);
+        updateCommentedFilms, api);
+    filmController.render(film, comments[film.id]);
     return filmController;
   });
 };
@@ -34,6 +31,7 @@ export default class FilmBlockController {
     this._container = container;
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
+    this._comments = this._commentsModel.getComments();
     this._api = api;
 
     this._showedFilmControllers = [];
@@ -127,8 +125,8 @@ export default class FilmBlockController {
 
   _renderFilms(films) {
 
-    const newFilms = renderFilms(this._filmListContainerComponent.getElement(), films, this._onDataChange,
-        this._onViewChange, this._onCommentChange, this._updateCommentedFilms, this._commentsModel, this._api);
+    const newFilms = renderFilms(this._filmListContainerComponent.getElement(), films, this._comments, this._onDataChange,
+        this._onViewChange, this._onCommentChange, this._updateCommentedFilms, this._api);
     this._showedFilmControllers = this._showedFilmControllers.concat(newFilms);
 
   }
@@ -141,17 +139,17 @@ export default class FilmBlockController {
 
   }
 
-  _updateFilm(oldData, newData, comments) {
+  _updateFilm(oldData, newData) {
     const allShowedControllers = this._showedFilmControllers.concat(this._showedTopFilmControllers, this._showedCommentsFilmControllers);
     const showedFilmControllers = allShowedControllers.filter((controller) => controller.getFilm() === oldData);
-    showedFilmControllers.forEach((controller) => controller.render(newData, comments));
+    showedFilmControllers.forEach((controller) => controller.render(newData, this._comments[newData.id]));
   }
 
   _renderExtraFilms(header, films) {
 
     const [filmExtraListComponent, filmExtraListContainerComponent] = renderFilmListContainer(this._container, {title: header, isExtra: true});
-    const newFilms = renderFilms(filmExtraListContainerComponent.getElement(), films, this._onDataChange,
-        this._onViewChange, this._onCommentChange, this._updateCommentedFilms, this._commentsModel, this._api);
+    const newFilms = renderFilms(filmExtraListContainerComponent.getElement(), films, this._comments, this._onDataChange,
+        this._onViewChange, this._onCommentChange, this._updateCommentedFilms, this._api);
     return [newFilms, filmExtraListComponent, filmExtraListContainerComponent];
 
   }
@@ -194,25 +192,17 @@ export default class FilmBlockController {
       .then((filmModel) => {
         const isSuccess = this._filmsModel.updateFilm(oldData.id, filmModel);
         if (isSuccess) {
-          this._updateFilm(oldData, newData, this._commentsModel.getCommentsById(oldData.id));
+          this._updateFilm(oldData, newData);
         }
       });
   }
 
   _onCommentChange(filmController, oldData, newData, commentId, comments) {
-        let isSuccess = false;
-        let newComments = null;
-        if (comments === null) {
-          isSuccess = this._commentsModel.deleteComment(oldData.id, commentId) && this._filmsModel.updateFilm(oldData.id, newData);
-          newComments = this._commentsModel.getCommentsById(oldData.id);
-        };
-        if (commentId === null) {
-          isSuccess = this._commentsModel.createComment(oldData.id, comments) && this._filmsModel.updateFilm(oldData.id, newData);
-          newComments = comments;
-        };
-        if (isSuccess) {
-          this._updateFilm(oldData, newData, newComments);
-        }
+    const isSuccess = this._commentsModel.updateComments(oldData.id, commentId, comments)
+      && this._filmsModel.updateFilm(oldData.id, newData);
+    if (isSuccess) {
+      this._updateFilm(oldData, newData);
+    }
   }
 
   _onViewChange() {

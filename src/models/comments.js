@@ -18,13 +18,13 @@ export default class Comments {
     this._callHandlers(this._dataChangeHandlers);
   }
 
-  deleteComment(filmId, commentId) {
-    this._comments[filmId] = this._comments[filmId].filter((comment) => comment.id !== commentId);
-    return true;
-  }
-
-  createComment(filmId, comments) {
-    this._comments[filmId] = comments;
+  updateComments(filmId, commentId, comments) {
+    if (commentId === null) {
+      this._comments[filmId] = comments;
+    }
+    if (comments === null) {
+      this._comments[filmId] = this._comments[filmId].filter((comment) => comment.id !== commentId);
+    }
     return true;
   }
 

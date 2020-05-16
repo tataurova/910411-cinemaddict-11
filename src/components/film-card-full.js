@@ -13,9 +13,9 @@ const ButtonStatus = {
 const shake = (element) => {
   element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
 
-    setTimeout(() => {
-      element.style.animation = ``;
-    }, SHAKE_ANIMATION_TIMEOUT);
+  setTimeout(() => {
+    element.style.animation = ``;
+  }, SHAKE_ANIMATION_TIMEOUT);
 };
 
 const createGenresTemplate = (genres) => {
@@ -26,7 +26,7 @@ const createGenresTemplate = (genres) => {
   }).join(`\n`);
 };
 
-const createCommentsTemplate = (comments, externalData) => {
+const createCommentsTemplate = (comments) => {
 
   return comments.map((comment) => {
     const {id, text, emotion, author, date} = comment;
@@ -220,7 +220,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
   setDeleteCommentButtonClickHandler(handler) {
     const deleteCommentsButtons = this._element.querySelectorAll(`.film-details__comment-delete`);
     if (deleteCommentsButtons) {
-      Array.from(deleteCommentsButtons).forEach( (button) => button.addEventListener(`click`, (evt) => {
+      Array.from(deleteCommentsButtons).forEach((button) => button.addEventListener(`click`, (evt) => {
         evt.preventDefault();
         this._activeDeleteCommentButton = button;
         this._activeDeleteComment = button.closest(`.film-details__comment`);
@@ -240,7 +240,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
         this._activeTextCommentField = textCommentElement;
         this.disableActiveTextCommentField();
         handler(newComment);
-      };
+      }
     });
     this._addNewCommentHandler = handler;
   }

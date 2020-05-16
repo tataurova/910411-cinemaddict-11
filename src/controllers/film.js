@@ -2,7 +2,7 @@ import {isEscKey} from "../utils/keyboard.js";
 import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
 import FilmModel from "../models/film.js";
-import {FilmCardViewMode as ViewMode, ButtonID, SHAKE_ANIMATION_TIMEOUT} from "../const.js";
+import {FilmCardViewMode as ViewMode, ButtonID} from "../const.js";
 import {render, remove, replace} from "../utils/render.js";
 
 export default class FilmController {
@@ -36,7 +36,7 @@ export default class FilmController {
     const oldFilmCardFullComponent = this._filmCardFullComponent;
 
     this._filmCardComponent = new FilmCardComponent(film);
-    this._filmCardFullComponent = new FilmCardFullComponent(film, this._comments);
+    this._filmCardFullComponent = new FilmCardFullComponent(film, comments);
 
     this._setFilmCardComponentHandlers();
     this._setFilmCardFullComponentHandlers();
@@ -134,20 +134,18 @@ export default class FilmController {
     });
 
     this._filmCardFullComponent.setAddNewCommentHandler((newComment) => {
-        if (newComment) {
-          const newFilm = FilmModel.clone(this._film);
-          this._api.createComment(this._film.id, newComment)
+      if (newComment) {
+        const newFilm = FilmModel.clone(this._film);
+        this._api.createComment(this._film.id, newComment)
             .then((comments) => {
-                newFilm.comments = comments.map((comment) => comment.id);
-//                console.log(newFilm);
-//                console.log(comments);
-                this._onCommentChange(this, this._film, newFilm, null, comments);
+              newFilm.comments = comments.map((comment) => comment.id);
+              this._onCommentChange(this, this._film, newFilm, null, comments);
             })
             .catch(() => {
               this._filmCardFullComponent.setRedFrameTextCommentField();
               this._filmCardFullComponent.shake();
             });
-        }
+      }
     });
   }
 
