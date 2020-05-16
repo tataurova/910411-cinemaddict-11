@@ -1,4 +1,4 @@
-import {isEscKey, isCtrlAndEnter} from "../utils/keyboard.js";
+import {isEscKey} from "../utils/keyboard.js";
 import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
 import FilmModel from "../models/film.js";
@@ -6,13 +6,15 @@ import {FilmCardViewMode as ViewMode, ButtonID} from "../const.js";
 import {render, remove, replace} from "../utils/render.js";
 
 export default class FilmController {
-  constructor(container, onDataChange, onViewChange, updateCommentedFilms, commentsModel) {
+  constructor(container, onDataChange, onViewChange, onCommentChange, updateCommentedFilms, api) {
     this._container = container;
-    this._commentsModel = commentsModel;
     this._film = null;
+    this._comments = null;
+    this._api = api;
 
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._onCommentChange = onCommentChange;
     this._updateCommentedFilms = updateCommentedFilms;
     this._mode = ViewMode.DEFAULT;
 
@@ -26,20 +28,20 @@ export default class FilmController {
     this._hideFilmPopup = this._hideFilmPopup.bind(this);
   }
 
-  render(film) {
+  render(film, comments) {
     this._film = film;
+    this._comments = comments;
 
     const oldFilmCardComponent = this._filmCardComponent;
     const oldFilmCardFullComponent = this._filmCardFullComponent;
 
     this._filmCardComponent = new FilmCardComponent(film);
-    this._filmCardFullComponent = new FilmCardFullComponent(film, this._commentsModel);
+    this._filmCardFullComponent = new FilmCardFullComponent(film, comments);
 
     this._setFilmCardComponentHandlers();
     this._setFilmCardFullComponentHandlers();
 
     if (oldFilmCardComponent && oldFilmCardFullComponent) {
-
       replace(this._filmCardComponent, oldFilmCardComponent);
       replace(this._filmCardFullComponent, oldFilmCardFullComponent);
     } else {
@@ -115,27 +117,36 @@ export default class FilmController {
       }
     });
 
-    this._filmCardFullComponent.setDeleteCommentButtonClickHandler((evt) => {
-      evt.preventDefault();
+    this._filmCardFullComponent.setDeleteCommentButtonClickHandler((removeCommentId) => {
+      this._filmCardFullComponent.disableDeleteButton();
 
-      const deleteButtonElement = evt.target;
-      const commentItem = deleteButtonElement.closest(`.film-details__comment`);
-      const removeCommentId = commentItem.dataset.id;
-      const comments = this._film.comments.filter((comment) => comment.id !== removeCommentId);
+      const newFilm = FilmModel.clone(this._film);
+      newFilm.comments = newFilm.comments.filter((commentId) => commentId !== removeCommentId);
 
-      this._onDataChange(this, this._film, Object.assign(this._film, {comments}));
+      this._api.deleteComment(removeCommentId)
+        .then(() => {
+          this._onCommentChange(this, this._film, newFilm, removeCommentId, null);
+        })
+        .catch(() => {
+          this._filmCardFullComponent.enableDeleteButton();
+          this._filmCardFullComponent.shakeActiveDeleteComment();
+        });
     });
 
-    this._filmCardFullComponent.setAddNewCommentHandler((evt) => {
-      if (isCtrlAndEnter(evt)) {
-        const comment = this._filmCardFullComponent.getNewComment();
-        if (comment) {
-          const newComments = this._film.comments.concat(comment);
-          this._onDataChange(this, this._film, Object.assign(this._film, {comments: newComments}));
-        }
+    this._filmCardFullComponent.setAddNewCommentHandler((newComment) => {
+      if (newComment) {
+        const newFilm = FilmModel.clone(this._film);
+        this._api.createComment(this._film.id, newComment)
+            .then((comments) => {
+              newFilm.comments = comments.map((comment) => comment.id);
+              this._onCommentChange(this, this._film, newFilm, null, comments);
+            })
+            .catch(() => {
+              this._filmCardFullComponent.setRedFrameTextCommentField();
+              this._filmCardFullComponent.shake();
+            });
       }
     });
-
   }
 
   _showFilmPopup() {

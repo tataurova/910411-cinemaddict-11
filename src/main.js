@@ -13,8 +13,9 @@ import StatsComponent from "./components/stats.js";
 import StatisticsComponent from "./components/statistics.js";
 
 const AUTHORIZATION = `Basic DSffsgGFDGDFgsdf&s`;
+const END_POINT = `https://11.ecmascript.pages.academy/cinemaddict`;
 
-const api = new API(AUTHORIZATION);
+const api = new API(END_POINT, AUTHORIZATION);
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
 

@@ -18,6 +18,16 @@ export default class Comments {
     this._callHandlers(this._dataChangeHandlers);
   }
 
+  updateComments(filmId, commentId, comments) {
+    if (commentId === null) {
+      this._comments[filmId] = comments;
+    }
+    if (comments === null) {
+      this._comments[filmId] = this._comments[filmId].filter((comment) => comment.id !== commentId);
+    }
+    return true;
+  }
+
   setDataChangeHandler(handler) {
     this._dataChangeHandlers.push(handler);
   }

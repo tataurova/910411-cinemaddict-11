@@ -94,3 +94,5 @@ export const StatisticFilterType = {
   MONTH: `month`,
   YEAR: `year`
 };
+
+export const SHAKE_ANIMATION_TIMEOUT = 600;
