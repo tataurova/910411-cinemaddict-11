@@ -197,8 +197,8 @@ export default class FilmBlockController {
       });
   }
 
-  _onCommentChange(filmController, oldData, newData, commentId, comments) {
-    const isSuccess = this._commentsModel.updateComments(oldData.id, commentId, comments)
+  _onCommentChange(filmController, oldData, newData, newComments) {
+    const isSuccess = this._commentsModel.updateComments(oldData.id, newComments)
       && this._filmsModel.updateFilm(oldData.id, newData);
     if (isSuccess) {
       this._updateFilm(oldData, newData);

@@ -11,3 +11,7 @@ export const getHoursDuration = (duration) => {
 export const getMinutesDuration = (duration) => {
   return moment.utc(moment.duration(duration, `minutes`).asMilliseconds()).format(`m`);
 };
+
+export const getStoreName = (prefix, version) => {
+  return `cinemaddict-${prefix}-storage-${version}`;
+};

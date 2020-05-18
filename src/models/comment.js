@@ -15,6 +15,16 @@ export default class Comment {
     };
   }
 
+  toRAWforStore() {
+    return {
+      "author": this.author,
+      "comment": this.text,
+      "date": this.date,
+      "emotion": this.emotion,
+      "id": this.id,
+    };
+  }
+
   static parseComment(data) {
     return new Comment(data);
   }
