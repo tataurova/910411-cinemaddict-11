@@ -121,11 +121,12 @@ export default class FilmController {
       this._filmCardFullComponent.disableDeleteButton();
 
       const newFilm = FilmModel.clone(this._film);
+      const newComments = this._comments.filter((comment) => comment.id !== removeCommentId);
       newFilm.comments = newFilm.comments.filter((commentId) => commentId !== removeCommentId);
 
-      this._api.deleteComment(removeCommentId)
+      this._api.deleteComment(newFilm, newComments, removeCommentId)
         .then(() => {
-          this._onCommentChange(this, this._film, newFilm, removeCommentId, null);
+          this._onCommentChange(this, this._film, newFilm, newComments);
         })
         .catch(() => {
           this._filmCardFullComponent.enableDeleteButton();
@@ -136,10 +137,10 @@ export default class FilmController {
     this._filmCardFullComponent.setAddNewCommentHandler((newComment) => {
       if (newComment) {
         const newFilm = FilmModel.clone(this._film);
-        this._api.createComment(this._film.id, newComment)
+        this._api.createComment(this._film, newComment)
             .then((comments) => {
               newFilm.comments = comments.map((comment) => comment.id);
-              this._onCommentChange(this, this._film, newFilm, null, comments);
+              this._onCommentChange(this, this._film, newFilm, comments);
             })
             .catch(() => {
               this._filmCardFullComponent.setRedFrameTextCommentField();
