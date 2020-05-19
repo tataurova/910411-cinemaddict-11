@@ -1,4 +1,4 @@
-import {CardCount, SortType, RenderPosition} from "../const.js";
+import {CardCount, RenderPosition, SHOWING_FILTERED_FILMS_COUNT,  SortType} from "../const.js";
 import {getSortedFilms} from "../utils/sort.js";
 import FilmController from "./film.js";
 import FilmListComponent from "../components/film-list.js";
@@ -85,11 +85,11 @@ export default class FilmBlockController {
     const container = this._container;
     const films = this._filmsModel.getFilms();
 
-    render(container, this._sortComponent);
+    render(container, this._sortComponent, RenderPosition.BEFOREBEGIN);
 
     if (films.length === 0) {
       const filmListComponentNoFilms = new FilmListComponent({title: `There are no movies in our database`});
-      render(container, filmListComponentNoFilms);
+      render(container, filmListComponentNoFilms, RenderPosition.AFTERBEGIN);
       return;
     }
 
@@ -117,26 +117,24 @@ export default class FilmBlockController {
   }
 
   _removeFilms(filmControllers) {
-
     filmControllers.forEach((filmController) => filmController.destroy());
     filmControllers = [];
   }
 
-
   _renderFilms(films) {
-
     const newFilms = renderFilms(this._filmListContainerComponent.getElement(), films, this._comments, this._onDataChange,
         this._onViewChange, this._onCommentChange, this._updateCommentedFilms, this._api);
     this._showedFilmControllers = this._showedFilmControllers.concat(newFilms);
-
   }
 
-  _updateFilms(count) {
-
+  _updateFilms(films) {
     this._removeFilms(this._showedFilmControllers);
-    this._renderFilms(this._filmsModel.getFilms().slice(0, count));
+    this._renderFilms(films);
+    if (films.length < SHOWING_FILTERED_FILMS_COUNT) {
+       remove(this._showMoreButtonComponent);
+       return;
+    }
     this._renderShowMoreButton();
-
   }
 
   _updateFilm(oldData, newData) {
@@ -146,12 +144,10 @@ export default class FilmBlockController {
   }
 
   _renderExtraFilms(header, films) {
-
     const [filmExtraListComponent, filmExtraListContainerComponent] = renderFilmListContainer(this._container, {title: header, isExtra: true});
     const newFilms = renderFilms(filmExtraListContainerComponent.getElement(), films, this._comments, this._onDataChange,
         this._onViewChange, this._onCommentChange, this._updateCommentedFilms, this._api);
     return [newFilms, filmExtraListComponent, filmExtraListContainerComponent];
-
   }
 
   _updateCommentedFilms() {
@@ -210,19 +206,14 @@ export default class FilmBlockController {
   }
 
   _onSortTypeChange(sortType) {
-
-    this._showingFilmCount = CardCount.ON_START;
     const sortedFilms = getSortedFilms(this._filmsModel.getFilms(), sortType);
-
-    this._removeFilms(this._showedFilmControllers);
-    this._renderFilms(sortedFilms.slice(0, this._showingFilmCount));
-    this._renderShowMoreButton();
+    this._updateFilms(sortedFilms.slice(0, this._showingFilmCount));
   }
 
   _onFilterChange() {
-    this._sortComponent.reset();
     this._showingFilmCount = CardCount.ON_START;
-    this._updateFilms(CardCount.ON_START);
+    this._sortComponent.reset();
+    this._updateFilms(this._filmsModel.getFilms().slice(0, CardCount.ON_START));
   }
 
 }

@@ -1,9 +1,10 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {FilterPeriod, FILTER_PERIOD_DIFFERENCE, RATING_TITLES, StatisticFilterType} from "../const.js";
+import {getFilterNameById} from "../utils/filter.js";
 import {getHoursDuration, getMinutesDuration} from "../utils/common.js";
 import moment from "moment";
-import {StatisticFilterType, RATING_TITLES, FilterPeriod} from "../const.js";
 
 const getProfileRating = (value) => RATING_TITLES
    .find(({rating}) => rating <= value)
@@ -11,10 +12,6 @@ const getProfileRating = (value) => RATING_TITLES
 
 const BAR_HEIGHT = 50;
 const FILTER_ID_PREFIX = `statistic-`;
-
-const getFilterNameById = (id) => {
-  return id.substring(FILTER_ID_PREFIX.length);
-};
 
 const getFilmsGenres = (films) => {
   let genresAll = new Set();
@@ -49,6 +46,16 @@ const getCountFilmsByGenre = (films) => {
   return genresStatistic.sort((a, b) => b.count - a.count);
 };
 
+const filterMarkupTemplate = (FilterType, currentFilter) => {
+  return Object.values(FilterType).map((filter) => {
+    const filterName = filter.toLowerCase();
+    return (
+      `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${filterName}" value="${filterName}" ${currentFilter === filterName ? `checked` : ``}>
+      <label for="statistic-${filterName}" class="statistic__filters-label">${filter}</label>`
+    );
+  }).join(`\n`);
+};
+
 const createStatisticsTemplate = (films, currentFilter, filmsCount) => {
 
   const filmsDuration = films.reduce(function (sum, current) {
@@ -66,21 +73,7 @@ const createStatisticsTemplate = (films, currentFilter, filmsCount) => {
 
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" ${currentFilter === StatisticFilterType.ALL ? `checked` : ``}>
-      <label for="statistic-all-time" class="statistic__filters-label">All time</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today" ${currentFilter === StatisticFilterType.TODAY ? `checked` : ``}>
-      <label for="statistic-today" class="statistic__filters-label">Today</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week" ${currentFilter === StatisticFilterType.WEEK ? `checked` : ``}>
-      <label for="statistic-week" class="statistic__filters-label">Week</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month" ${currentFilter === StatisticFilterType.MONTH ? `checked` : ``}>
-      <label for="statistic-month" class="statistic__filters-label">Month</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year" ${currentFilter === StatisticFilterType.YEAR ? `checked` : ``}>
-      <label for="statistic-year" class="statistic__filters-label">Year</label>
+      ${filterMarkupTemplate(StatisticFilterType, currentFilter)}
     </form>
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
@@ -146,7 +139,7 @@ export default class Statistic extends AbstractSmartComponent {
       const currentDate = moment(new Date());
       const filterPeriod = FilterPeriod[filter];
       const dateDifference = currentDate.diff(watchingDate, filterPeriod);
-      return dateDifference < 1;
+      return dateDifference < FILTER_PERIOD_DIFFERENCE;
     });
   }
 
@@ -155,7 +148,7 @@ export default class Statistic extends AbstractSmartComponent {
       const filterType = evt.target.id;
 
       if (filterType) {
-        this._currentFilter = getFilterNameById(filterType);
+        this._currentFilter = getFilterNameById(FILTER_ID_PREFIX, filterType);
         this.rerender();
       }
     });
