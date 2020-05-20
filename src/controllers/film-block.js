@@ -1,4 +1,4 @@
-import {CardCount, RenderPosition, SHOWING_FILTERED_FILMS_COUNT,  SortType} from "../const.js";
+import {CardCount, RenderPosition, SortType} from "../const.js";
 import {getSortedFilms} from "../utils/sort.js";
 import FilmController from "./film.js";
 import FilmListComponent from "../components/film-list.js";
