@@ -11,10 +11,9 @@ const filterMarkupTemplate = (filters) => {
     return (
       `<a href="#${filter.name}"
        id="filter__${filter.name}"
-       class="main-navigation__item${filter.active ? ` main-navigation__item--active` : ``}">${filter.name === FilterType.ALL ? `All movies` : filter.name}
-       ${filter.count <= SHOWING_FILTERED_FILMS_COUNT
-        ? `<span class="main-navigation__item-count">${filter.count}</span>`
-        : ``}</a>`
+       class="main-navigation__item${filter.active ? ` main-navigation__item--active` : ``}">${filter.name === FilterType.ALL ? `All movies` : `${filter.name}
+        <span class="main-navigation__item-count">${filter.count}</span>`}
+        </a>`
     );
   }).join(`\n`);
 };
