@@ -130,11 +130,6 @@ export default class FilmBlockController {
   _updateFilms(films) {
     this._removeFilms(this._showedFilmControllers);
     this._renderFilms(films);
-    if (films.length < SHOWING_FILTERED_FILMS_COUNT) {
-       remove(this._showMoreButtonComponent);
-       return;
-    }
-    this._renderShowMoreButton();
   }
 
   _updateFilm(oldData, newData) {
@@ -214,6 +209,10 @@ export default class FilmBlockController {
     this._showingFilmCount = CardCount.ON_START;
     this._sortComponent.reset();
     this._updateFilms(this._filmsModel.getFilms().slice(0, CardCount.ON_START));
+    this._renderShowMoreButton();
+    if (this._filmsModel.getFilms().length <= 5) {
+      remove(this._showMoreButtonComponent);
+    }
   }
 
 }
