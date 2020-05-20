@@ -2,7 +2,6 @@ import AbstractComponent from "./abstract-component.js";
 import {activateElement} from "../utils/interactivity";
 import {FilterType} from "../const.js";
 import {getFilterNameById} from "../utils/filter.js";
-import {SHOWING_FILTERED_FILMS_COUNT} from "../const.js";
 
 const FILTER_ID_PREFIX = `filter__`;
 
