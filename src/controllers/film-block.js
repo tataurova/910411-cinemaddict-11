@@ -1,4 +1,4 @@
-import {CardCount, RenderPosition, SortType} from "../const.js";
+import {CardCount, RenderPosition, SHOWING_FILTERED_FILMS_COUNT, SortType} from "../const.js";
 import {getSortedFilms} from "../utils/sort.js";
 import FilmController from "./film.js";
 import FilmListComponent from "../components/film-list.js";
@@ -210,7 +210,7 @@ export default class FilmBlockController {
     this._sortComponent.reset();
     this._updateFilms(this._filmsModel.getFilms().slice(0, CardCount.ON_START));
     this._renderShowMoreButton();
-    if (this._filmsModel.getFilms().length <= 5) {
+    if (this._filmsModel.getFilms().length <= SHOWING_FILTERED_FILMS_COUNT) {
       remove(this._showMoreButtonComponent);
     }
   }
