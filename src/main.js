@@ -1,5 +1,5 @@
 import API from "./api/index.js";
-import {AUTHORIZATION, CardCount, END_POINT, MENU_ITEM_STATS, STORE_VER} from "./const.js";
+import {AUTHORIZATION, END_POINT, MENU_ITEM_STATS, STORE_VER} from "./const.js";
 import CommentsModel from "./models/comments.js";
 import FilmBlockComponent from "./components/film-block.js";
 import FilmBlockController from "./controllers/film-block.js";

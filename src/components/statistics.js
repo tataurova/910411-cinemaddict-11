@@ -14,7 +14,7 @@ const BAR_HEIGHT = 50;
 const FILTER_ID_PREFIX = `statistic-`;
 
 const getFilmsGenres = (films) => {
-  let genresAll = new Set();
+  const genresAll = new Set();
   films.forEach((film) => {
     film.genres.forEach((genre) => {
       genresAll.add(genre);
