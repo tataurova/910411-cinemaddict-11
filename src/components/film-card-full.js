@@ -1,22 +1,10 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {COMMENT_EMOJIS, SHAKE_ANIMATION_TIMEOUT} from "../const.js";
+import {ButtonStatus, COMMENT_EMOJIS, GENRE_MIN_COUNT} from "../const.js";
 import {encode} from "he";
 import {formatDuration} from "../utils/common.js";
 import {isCtrlAndEnter} from "../utils/keyboard.js";
 import moment from "moment";
-
-const ButtonStatus = {
-  ENABLED: `Delete`,
-  DISABLED: `Deleting...`,
-};
-
-const shake = (element) => {
-  element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-
-  setTimeout(() => {
-    element.style.animation = ``;
-  }, SHAKE_ANIMATION_TIMEOUT);
-};
+import {shake} from "../utils/interactivity.js";
 
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
@@ -30,7 +18,8 @@ const createCommentsTemplate = (comments) => {
 
   return comments.map((comment) => {
     const {id, text, emotion, author, date} = comment;
-    const commentDate = moment(date).format(`YYYY/MM/DD`);
+    const commentDate = moment(date, `YYYY/MM/DD`).fromNow();
+
     return (
       `<li data-id="${id}" class="film-details__comment">
             <span class="film-details__comment-emoji">
@@ -126,7 +115,7 @@ const createFilmCardFullTemplate = (film, comments, options = {}) => {
       [`Release Date`, `${releaseDate}`],
       [`Runtime`, durationHours],
       [`Country`, country],
-      [genres.length === 1 ? `Genre` : `Genres`, createGenresTemplate(genres)]
+      [genres.length === GENRE_MIN_COUNT ? `Genre` : `Genres`, createGenresTemplate(genres)]
     ].map(([term, cell]) => (
       `<tr class="film-details__row">
                    <td class="film-details__term">${term}</td>
@@ -205,6 +194,46 @@ export default class FilmCardFull extends AbstractSmartComponent {
     this._setNewCommentEmoji();
   }
 
+  enableDeleteButton() {
+    this._activeDeleteCommentButton.disabled = false;
+    this._activeDeleteCommentButton.textContent = ButtonStatus.ENABLED;
+  }
+
+  disableDeleteButton() {
+    this._activeDeleteCommentButton.disabled = true;
+    this._activeDeleteCommentButton.textContent = ButtonStatus.DISABLED;
+  }
+
+  enableActiveTextCommentField() {
+    this._activeTextCommentField.disabled = false;
+  }
+
+  disableActiveTextCommentField() {
+    this._activeTextCommentField.disabled = true;
+  }
+
+  setRedFrameTextCommentField() {
+    this._activeTextCommentField.style.border = `1px solid red`;
+  }
+
+  shake() {
+    shake(this.getElement());
+  }
+
+  shakeActiveDeleteComment() {
+    shake(this._activeDeleteComment);
+  }
+
+  shakeActiveTextCommentField() {
+    shake(this._activeTextCommentField);
+  }
+
+  resetAddCommentForm() {
+    const textCommentElement = this._element.querySelector(`.film-details__comment-input`);
+    textCommentElement.value = ``;
+    this._emojiName = ``;
+  }
+
   setCloseButtonHandler(handler) {
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
     this._closeButtonHandler = handler;
@@ -234,49 +263,15 @@ export default class FilmCardFull extends AbstractSmartComponent {
   setAddNewCommentHandler(handler) {
     const textCommentElement = this._element.querySelector(`.film-details__comment-input`);
     textCommentElement.addEventListener(`keydown`, (evt) => {
+      this._activeTextCommentField = textCommentElement;
       if (isCtrlAndEnter(evt)) {
         const newComment = this._getNewComment();
 
-        this._activeTextCommentField = textCommentElement;
         this.disableActiveTextCommentField();
         handler(newComment);
       }
     });
     this._addNewCommentHandler = handler;
-  }
-
-  enableDeleteButton() {
-    this._activeDeleteCommentButton.disabled = false;
-    this._activeDeleteCommentButton.textContent = ButtonStatus.ENABLED;
-  }
-
-  disableDeleteButton() {
-    this._activeDeleteCommentButton.disabled = true;
-    this._activeDeleteCommentButton.textContent = ButtonStatus.DISABLED;
-  }
-
-  enableActiveTextCommentField() {
-    this._activeTextCommentField.disabled = true;
-  }
-
-  disableActiveTextCommentField() {
-    this._activeTextCommentField.disabled = false;
-  }
-
-  setRedFrameTextCommentField() {
-    this._activeTextCommentField.style.border = `1px solid red`;
-  }
-
-  shake() {
-    shake(this.getElement());
-  }
-
-  shakeActiveDeleteComment() {
-    shake(this._activeDeleteComment);
-  }
-
-  shakeActiveTextCommentField() {
-    shake(this._activeTextCommentField);
   }
 
   _getNewComment() {

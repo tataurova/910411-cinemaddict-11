@@ -19,15 +19,14 @@ export default class FilterController {
 
   render() {
     const container = this._container;
-    const allFilms = this._filmsModel.getFilms();
+    const allFilms = this._filmsModel.getAllFilms();
     const filters = Object.values(FilterType).map((filterType) => {
       return {
         name: filterType,
         count: getFilmsByFilter(allFilms, filterType).length,
-        checked: filterType === this._activeFilterType,
+        active: filterType === this._activeFilterType,
       };
     });
-
     const oldComponent = this._filterComponent;
 
     this._filterComponent = new FilterComponent(filters);
