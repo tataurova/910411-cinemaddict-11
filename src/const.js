@@ -104,6 +104,3 @@ export const StatisticFilterType = {
   MONTH: `month`,
   YEAR: `year`,
 };
-
-
-

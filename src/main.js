@@ -44,12 +44,12 @@ filmBlockController.renderLoadingMessage();
 
 siteMenuComponent.changeMenuItem((menuItem) => {
   if (menuItem === MENU_ITEM_STATS) {
-      filmBlockComponent.hide();
-      if (statisticsComponent) {
-        remove(statisticsComponent);
-        statisticsComponent = new StatisticsComponent(filmsModel);
-        render(siteMainElement, statisticsComponent);
-      }
+    filmBlockComponent.hide();
+    if (statisticsComponent) {
+      remove(statisticsComponent);
+      statisticsComponent = new StatisticsComponent(filmsModel);
+      render(siteMainElement, statisticsComponent);
+    }
   } else {
     statisticsComponent.hide();
     filmBlockComponent.show();
@@ -59,13 +59,13 @@ siteMenuComponent.changeMenuItem((menuItem) => {
 apiWithProvider.getFilms()
   .then((films) => {
     filmsModel.setFilms(films);
-     return Promise.all(films.map((film) => apiWithProvider.getComments(film.id)));
+    return Promise.all(films.map((film) => apiWithProvider.getComments(film.id)));
   })
   .then((comments) => {
-   const films = filmsModel.getFilms();
-   for (let i = 0; i < films.length; i++) {
-     commentsModel.setComments(films[i].id, comments[i]);
-   }
+    const films = filmsModel.getFilms();
+    for (let i = 0; i < films.length; i++) {
+      commentsModel.setComments(films[i].id, comments[i]);
+    }
   })
   .catch(() => {
     filmsModel.setFilms([]);
@@ -77,7 +77,7 @@ apiWithProvider.getFilms()
     render(headerElement, new ProfileComponent(watchStats));
     filmBlockController.render(films);
     render(footerStatisticElement, new StatsComponent(films.length));
-  })
+  });
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)
@@ -85,7 +85,7 @@ window.addEventListener(`load`, () => {
       // Действие в случае успешной регистрации ServiceWorker
     }).catch(() => {
       // Действие в случае ошибки при регистрации ServiceWorker
-  });
+    });
 });
 
 window.addEventListener(`online`, () => {
