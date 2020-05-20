@@ -4,7 +4,7 @@ const createFilmListTemplate = (info) => {
   const {title, isExtra = false, isNoHeader} = info;
   return (
     `<section class="films-list${isExtra ? `--extra` : ``}">
-      <h2 class="films-list__title ${isNoHeader ? `visually-hidden` : ``}">${title}</h2>
+      <h2 class="films-list__title ${isNoHeader === true ? `visually-hidden` : ``}">${title}</h2>
      </section>`
   );
 };

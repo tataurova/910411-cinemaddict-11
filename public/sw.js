@@ -2,7 +2,7 @@ const Cache = {
   PREFIX: `cinemaddict-cache`,
   VER: `v1`,
   get NAME() {
-    return `${this.CACHE_PREFIX}-${this.CACHE_VER}`;
+    return `${this.PREFIX}-${this.VER}`;
   },
 };
 

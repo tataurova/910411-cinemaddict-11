@@ -1,5 +1,5 @@
 import API from "./api/index.js";
-import {CardCount, MENU_ITEM_STATS} from "./const.js";
+import {AUTHORIZATION, CardCount, END_POINT, MENU_ITEM_STATS, STORE_VER} from "./const.js";
 import CommentsModel from "./models/comments.js";
 import FilmBlockComponent from "./components/film-block.js";
 import FilmBlockController from "./controllers/film-block.js";
@@ -14,10 +14,6 @@ import SiteMenuComponent from "./components/site-menu.js";
 import StatsComponent from "./components/stats.js";
 import StatisticsComponent from "./components/statistics.js";
 import Store from "./api/store.js";
-
-const AUTHORIZATION = `Basic DSffsgGFDGDFgsdf&s`;
-const END_POINT = `https://11.ecmascript.pages.academy/cinemaddict`;
-const STORE_VER = `v1`;
 
 const api = new API(END_POINT, AUTHORIZATION);
 const filmStore = new Store(getStoreName(`film`, STORE_VER), window.localStorage);
@@ -75,11 +71,12 @@ apiWithProvider.getFilms()
     filmsModel.setFilms([]);
   })
   .finally(() => {
+    const films = filmsModel.getFilms();
+    const watchStats = getWatchStats(films);
     filmBlockController.removeLoadingMessage();
-    const watchStats = getWatchStats(filmsModel.getFilms());
-    render(footerStatisticElement, new StatsComponent(filmsModel.getFilms().length));
     render(headerElement, new ProfileComponent(watchStats));
-    filmBlockController.render(filmsModel.getFilms());
+    filmBlockController.render(films);
+    render(footerStatisticElement, new StatsComponent(films.length));
   })
 
 window.addEventListener(`load`, () => {

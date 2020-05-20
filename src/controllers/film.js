@@ -1,8 +1,8 @@
+import {ButtonID, FilmCardViewMode as ViewMode} from "../const.js";
 import {isEscKey} from "../utils/keyboard.js";
 import FilmCardComponent from "../components/film-card.js";
 import FilmCardFullComponent from "../components/film-card-full.js";
 import FilmModel from "../models/film.js";
-import {FilmCardViewMode as ViewMode, ButtonID} from "../const.js";
 import {render, remove, replace} from "../utils/render.js";
 
 export default class FilmController {
@@ -162,6 +162,7 @@ export default class FilmController {
 
   _hideFilmPopup() {
     this._mode = ViewMode.DEFAULT;
+    this._filmCardFullComponent.resetAddCommentForm();
     remove(this._filmCardFullComponent);
     this._updateCommentedFilms();
     document.removeEventListener(`keydown`, this._onEscKeyDown);

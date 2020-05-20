@@ -26,4 +26,8 @@ export const getFilmsByFilter = (films, filterType) => {
   return films;
 };
 
+export const getFilterNameById = (prefix, id) => {
+  return id.substring(prefix.length);
+};
+
 
