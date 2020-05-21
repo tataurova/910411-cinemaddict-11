@@ -19,7 +19,6 @@ export default class Film {
     this.isWatched = data.user_details.already_watched;
     this.isFavorite = data.user_details.favorite;
     this.watchingDate = data.user_details.watching_date;
-    this.test = `test`;
   }
 
   toRAW() {
