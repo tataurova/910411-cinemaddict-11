@@ -1,13 +1,12 @@
-import API from "./api/index.js";
+import API from "./api/api.js";
 import {AUTHORIZATION, END_POINT, MENU_ITEM_STATS, STORE_VER} from "./const.js";
 import CommentsModel from "./models/comments.js";
 import FilmBlockComponent from "./components/film-block.js";
-import FilmBlockController from "./controllers/film-block.js";
+import FilmBlockController from "./controllers/film-block-controller.js";
 import FilmsModel from "./models/films.js";
-import FilterController from "./controllers/filter.js";
-import {getWatchStats} from "./utils/stats.js";
+import FilterController from "./controllers/filter-controller.js";
 import {getStoreName} from "./utils/common.js";
-import ProfileComponent from "./components/profile.js";
+import ProfileControllerComponent from "./controllers/profile-controller.js";
 import Provider from "./api/provider.js";
 import {render, remove} from "./utils/render.js";
 import SiteMenuComponent from "./components/site-menu.js";
@@ -42,7 +41,7 @@ render(siteMainElement, filmBlockComponent);
 
 filmBlockController.renderLoadingMessage();
 
-siteMenuComponent.changeMenuItem((menuItem) => {
+siteMenuComponent.menuClickHandler((menuItem) => {
   if (menuItem === MENU_ITEM_STATS) {
     filmBlockComponent.hide();
     if (statisticsComponent) {
@@ -72,9 +71,9 @@ apiWithProvider.getFilms()
   })
   .finally(() => {
     const films = filmsModel.getFilms();
-    const watchStats = getWatchStats(films);
     filmBlockController.removeLoadingMessage();
-    render(headerElement, new ProfileComponent(watchStats));
+    const profileController = new ProfileControllerComponent(headerElement, filmsModel);
+    profileController.render();
     filmBlockController.render(films);
     render(footerStatisticElement, new StatsComponent(films.length));
   });

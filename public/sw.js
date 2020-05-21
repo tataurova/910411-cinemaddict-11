@@ -6,6 +6,8 @@ const Cache = {
   },
 };
 
+const resources =
+
 self.addEventListener(`install`, (evt) => {
   evt.waitUntil(
       caches.open(Cache.NAME)

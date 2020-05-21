@@ -18,7 +18,7 @@ export default class SiteMenu extends AbstractComponent {
     return createSiteMenuTemplate();
   }
 
-  changeMenuItem(handler) {
+  menuClickHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
       if (evt.target.tagName !== `A`) {

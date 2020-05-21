@@ -14,6 +14,8 @@ export const MENU_ITEM_STATS = `stats`;
 
 export const SHAKE_ANIMATION_TIMEOUT = 600;
 
+export const SHOWING_FILTERED_FILMS_COUNT = 5;
+
 export const STORE_VER = `v1`;
 
 export const COMMENT_EMOJIS = [

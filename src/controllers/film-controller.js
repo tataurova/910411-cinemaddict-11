@@ -136,6 +136,7 @@ export default class FilmController {
 
     this._filmCardFullComponent.setAddNewCommentHandler((newComment) => {
       if (newComment) {
+        this._filmCardFullComponent.disableActiveTextCommentField();
         const newFilm = FilmModel.clone(this._film);
         this._api.createComment(this._film, newComment)
             .then((comments) => {
@@ -146,6 +147,9 @@ export default class FilmController {
               this._filmCardFullComponent.setRedFrameTextCommentField();
               this._filmCardFullComponent.shake();
             });
+      } else {
+        this._filmCardFullComponent.setRedFrameTextCommentField();
+        this._filmCardFullComponent.shake();
       }
     });
   }

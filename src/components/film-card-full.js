@@ -6,6 +6,15 @@ import {isCtrlAndEnter} from "../utils/keyboard.js";
 import moment from "moment";
 import {shake} from "../utils/interactivity.js";
 
+const createDetailsRowTemplate = (key, value) => {
+  return (
+    `<tr class="film-details__row">
+      <td class="film-details__term">${key}</td>
+      <td class="film-details__cell">${value}</td>
+    </tr>`
+  );
+};
+
 const createGenresTemplate = (genres) => {
   return genres.map((genre) => {
     return (
@@ -108,20 +117,13 @@ const createFilmCardFullTemplate = (film, comments, options = {}) => {
           </div>
 
           <table class="film-details__table">
-            ${[
-      [`Director`, director],
-      [`Writers`, writers.join(`, `)],
-      [`Actors`, actors.join(`, `)],
-      [`Release Date`, `${releaseDate}`],
-      [`Runtime`, durationHours],
-      [`Country`, country],
-      [genres.length === GENRE_MIN_COUNT ? `Genre` : `Genres`, createGenresTemplate(genres)]
-    ].map(([term, cell]) => (
-      `<tr class="film-details__row">
-                   <td class="film-details__term">${term}</td>
-                   <td class="film-details__cell">${cell}</td>
-                </tr>`
-    )).join(`\n`)}
+            ${createDetailsRowTemplate(`Director`, director)}
+            ${createDetailsRowTemplate(`Writers`, writers.join(`, `))}
+            ${createDetailsRowTemplate(`Actors`, actors.join(`, `))}
+            ${createDetailsRowTemplate(`Release Date`, `${releaseDate}`)}
+            ${createDetailsRowTemplate(`Runtime`, durationHours)}
+            ${createDetailsRowTemplate(`Country`, country)}
+            ${createDetailsRowTemplate(genres.length === GENRE_MIN_COUNT ? `Genre` : `Genres`, createGenresTemplate(genres))}
           </table>
 
           <p class="film-details__film-description">
@@ -229,7 +231,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
   }
 
   resetAddCommentForm() {
-    const textCommentElement = this._element.querySelector(`.film-details__comment-input`);
+    const textCommentElement = this.getElement().querySelector(`.film-details__comment-input`);
     textCommentElement.value = ``;
     this._emojiName = ``;
   }
@@ -247,7 +249,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
   }
 
   setDeleteCommentButtonClickHandler(handler) {
-    const deleteCommentsButtons = this._element.querySelectorAll(`.film-details__comment-delete`);
+    const deleteCommentsButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
     if (deleteCommentsButtons) {
       Array.from(deleteCommentsButtons).forEach((button) => button.addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -261,13 +263,11 @@ export default class FilmCardFull extends AbstractSmartComponent {
   }
 
   setAddNewCommentHandler(handler) {
-    const textCommentElement = this._element.querySelector(`.film-details__comment-input`);
+    const textCommentElement = this.getElement().querySelector(`.film-details__comment-input`);
     textCommentElement.addEventListener(`keydown`, (evt) => {
       this._activeTextCommentField = textCommentElement;
       if (isCtrlAndEnter(evt)) {
         const newComment = this._getNewComment();
-
-        this.disableActiveTextCommentField();
         handler(newComment);
       }
     });
@@ -275,7 +275,7 @@ export default class FilmCardFull extends AbstractSmartComponent {
   }
 
   _getNewComment() {
-    const textCommentElement = this._element.querySelector(`.film-details__comment-input`);
+    const textCommentElement = this.getElement().querySelector(`.film-details__comment-input`);
 
     const comment = encode(textCommentElement.value);
     const emotion = this._emojiName;

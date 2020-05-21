@@ -18,6 +18,10 @@ export default class Films {
     return this._films;
   }
 
+  getHistoryFilms() {
+    return this.getAllFilms().filter((film) => film.isWatched);
+  }
+
   setFilms(films) {
     this._films = Array.from(films);
     this._callHandlers(this._dataChangeHandlers);

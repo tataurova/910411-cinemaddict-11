@@ -1,17 +1,27 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {FilterPeriod, FILTER_PERIOD_DIFFERENCE, RATING_TITLES, StatisticFilterType} from "../const.js";
+import {FilterPeriod, FILTER_PERIOD_DIFFERENCE, StatisticFilterType} from "../const.js";
 import {getFilterNameById} from "../utils/filter.js";
 import {getHoursDuration, getMinutesDuration} from "../utils/common.js";
+import {getProfileRating} from "../utils/profile";
 import moment from "moment";
 
-const getProfileRating = (value) => RATING_TITLES
-   .find(({rating}) => rating <= value)
-   .title;
+const FILTER_ID_PREFIX = `statistic-`;
 
 const BAR_HEIGHT = 50;
-const FILTER_ID_PREFIX = `statistic-`;
+const BAR_THICKNESS = 24;
+
+const BAR_COLOR = `#ffe800`;
+const DATA_COLOR = `#ffffff`;
+
+const GENRE_PADDING = 100;
+const GENRES_COUNT_PADDING = 40;
+
+const DATA_FONT_SIZE = 20;
+
+const START_ALIGNMENT = `start`;
+
 
 const getFilmsGenres = (films) => {
   const genresAll = new Set();
@@ -103,7 +113,7 @@ export default class Statistic extends AbstractSmartComponent {
     super();
 
     this._filmsModel = filmsModel;
-    this._films = this._filmsModel.getFilms().filter((film) => film.isWatched);
+    this._films = this._filmsModel.getHistoryFilms();
     this._filmsCount = this._films.length;
     this._filteredFilms = this._films.slice();
     this._currentFilter = StatisticFilterType.ALL;
@@ -166,30 +176,30 @@ export default class Statistic extends AbstractSmartComponent {
         labels: this._chartData.map((it) => it.genreName),
         datasets: [{
           data: this._chartData.map((it) => it.count),
-          backgroundColor: `#ffe800`,
-          hoverBackgroundColor: `#ffe800`,
-          anchor: `start`,
-          barThickness: 24
+          backgroundColor: BAR_COLOR,
+          hoverBackgroundColor: BAR_COLOR,
+          anchor: START_ALIGNMENT,
+          barThickness: BAR_THICKNESS
         }]
       },
       options: {
         plugins: {
           datalabels: {
             font: {
-              size: 20
+              size: DATA_FONT_SIZE
             },
-            color: `#ffffff`,
-            anchor: `start`,
-            align: `start`,
-            offset: 40,
+            color: DATA_COLOR,
+            anchor: START_ALIGNMENT,
+            align: START_ALIGNMENT,
+            offset: GENRES_COUNT_PADDING
           }
         },
         scales: {
           yAxes: [{
             ticks: {
-              fontColor: `#ffffff`,
-              padding: 100,
-              fontSize: 20
+              fontColor: DATA_COLOR,
+              padding: GENRE_PADDING,
+              fontSize: DATA_FONT_SIZE
             },
             gridLines: {
               display: false,
