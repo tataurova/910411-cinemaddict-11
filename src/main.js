@@ -71,6 +71,7 @@ apiWithProvider.getFilms()
   })
   .finally(() => {
     const films = filmsModel.getFilms();
+    films.forEach((el) => {console.log(el.isWatched, el.watchingDate)});
     filmBlockController.removeLoadingMessage();
     const profileController = new ProfileControllerComponent(headerElement, filmsModel);
     profileController.render();
@@ -96,3 +97,5 @@ window.addEventListener(`online`, () => {
 window.addEventListener(`offline`, () => {
   document.title += ` [offline]`;
 });
+
+

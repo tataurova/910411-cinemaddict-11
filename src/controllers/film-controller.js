@@ -81,7 +81,9 @@ export default class FilmController {
     this._filmCardComponent.setMarkAsWatchedButtonClickHandler((evt) => {
       evt.preventDefault();
       const newFilm = FilmModel.clone(this._film);
-      newFilm.isWatched = !this._film.isWatched;
+      const value = !this._film.isWatched;
+      newFilm.isWatched = value;
+      newFilm.watchingDate = value ? new Date() : null;
       this._onDataChange(this, this._film, newFilm);
     });
 
@@ -107,7 +109,9 @@ export default class FilmController {
       }
       if (buttonID === ButtonID.WATCHED) {
         const newFilm = FilmModel.clone(this._film);
-        newFilm.isWatched = !this._film.isWatched;
+        const value = !this._film.isWatched;
+        newFilm.isWatched = value;
+        newFilm.watchingDate = value ? new Date() : null;
         this._onDataChange(this, this._film, newFilm);
       }
       if (buttonID === ButtonID.FAVORITE) {
